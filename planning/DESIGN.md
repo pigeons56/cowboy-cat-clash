@@ -1,4 +1,4 @@
-# CAT FIGHT
+# CAT FIGHTER
 
 ## Objective
 - Beat the other player in this local two-player fighting game!
@@ -17,12 +17,11 @@
 Player 1 controls (Player 2 controls)
 - W (^): jump
   - +Q (ENTER): up attack
-- A (<): run left
-  - +Q (ENTER) left attack
-- D (>): run right
-  - +Q (ENTER) right attack
-- S (v): block
-  - +Q (ENTER) down attack
+- A (<)/D (>): depends on orientation
+  - Forward walk/backward walk
+  - Q+Forward: attack
+  - Q+Backward: block
+- S+Q (ENTER) down attack (midair only)
 - E ('): special
 
 ## Assets
@@ -56,9 +55,10 @@ Battle Screen
   - Jump
   - Victory
   - Defeat
-  - Side attack
+  - Forward attack
   - Up attack
-  - Down attack
+  - Block
+  
 - Jump sounds
 - Hit sounds
 
