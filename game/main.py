@@ -75,37 +75,47 @@ class Credits_Screen(Screen):
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/select_screen_background.png")
-        self.player1_fighter=-1
-        self.player2_fighter=-1
+        self.ready_button = Button("ready_button",200,400,300,400,"../assets/buttons/ready_button_unclicked.png",
+                              "../assets/buttons/ready_button_clicked.png")
+        self.player1_fighter=Fighter("placeholder")
+        self.player2_fighter=Fighter("placeholder")
 
         self.load_portraits()
-        self.load_idles()
 
     def load_portraits(self):
         self.portraits=[None] * NUM_OF_FIGHTERS
-        fighter_names = list(FIGHTERS.keys())
         x,y=100,100
         for i in range(NUM_OF_FIGHTERS):
-            self.portraits[i] = Button(fighter_names[i],x,x+50,y,y+50,f"../assets/{fighter_names[i]}/{fighter_names[i]}_portrait.png",
-                                       f"../assets/{fighter_names[i]}/{fighter_names[i]}_portrait_clicked.png")
+            self.portraits[i] = Button(FIGHTERS[i],x,x+50,y,y+50,f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait_unclicked.png",
+                                       f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait_clicked.png")
             x+=50
-    
-    def load_idles(self):
-        fighter_objs = list(FIGHTERS.values())
-
-        for i in range(NUM_OF_FIGHTERS):
-            fighter_objs[i].load_idle_images()
 
     def blit_idles(self):
-        if self.player1_fighter != -1:
-            FIGHTERS[self.player1_fighter].play_idle_animation(self.screen)
-        if self.player2_fighter != -1:
-            FIGHTERS[self.player2_fighter].play_idle_animation(self.screen)
+        if self.player1_fighter.name != "placeholder":
+            self.player1_fighter.flip_assets("right")
+            self.player1_fighter.play_idle_animation(self.screen,0,200)
+        if self.player2_fighter.name != "placeholder":
+            self.player2_fighter.flip_assets("left")           
+            self.player2_fighter.play_idle_animation(self.screen,600,200)
 
+    def set_player_fighter(self,fighter,player_fighter_var):
+        if player_fighter_var.name != fighter:
+            if fighter == "doodles":
+                player_fighter_var = Doodles()
+            elif fighter == "bowie":
+                player_fighter_var = Bowie()
+            elif fighter == "ollie":
+                player_fighter_var = Ollie()
+            
+        return player_fighter_var
 
     def blit_portraits(self):
         for i in self.portraits:
             self.screen.blit(i.image,(i.left_x,i.left_y))
+
+    def blit_ready_button(self):
+        if self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
+            self.screen.blit(self.ready_button.image,(self.ready_button.left_x,self.ready_button.left_y))
 
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
@@ -115,9 +125,12 @@ class Select_Screen(Screen):
             for i in self.portraits:
                 if i.clicked:
                     if event.button == 1:
-                        self.player1_fighter = i.name
+                        self.player1_fighter = self.set_player_fighter(i.name,self.player1_fighter)
                     elif event.button == 3:
-                        self.player2_fighter = i.name
+                        self.player2_fighter = self.set_player_fighter(i.name,self.player2_fighter)
+            if self.ready_button.is_clicked(event.pos[0],event.pos[1]) and self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
+                print("bye")
+                self.running = False
     
     def end_loop_functions(self):
         start_screen.loop()
@@ -125,7 +138,9 @@ class Select_Screen(Screen):
     def loop_functions(self):
         self.blit_portraits()
         self.check_button_hover(self.portraits)
+        self.check_button_hover([self.ready_button])
         self.blit_idles()
+        self.blit_ready_button()
 
 class Start_Screen(Screen):
     def __init__(self):
@@ -167,39 +182,53 @@ class Start_Screen(Screen):
         self.check_button_hover(self.buttons)
 
 class Fighter():
-    def __init__(self, x, y, path):
-        self.x = x
-        self.y = y
+    def __init__(self, path):
         self.path = path
-
-        self.idle_frames_count = 0
-        self.load_idle_images()
-        print(self.idle_frames)
-
+        self.name = path
+        self.direction = "right"
 
     def load_idle_images(self):
         self.idle_frames = [None] * self.idle_frames_count
         for i in range(self.idle_frames_count):
-            print(f"../assets/{self.path}/{self.path}_idle{i}.png")
             self.idle_frames[i] = pg.image.load(f"../assets/{self.path}/{self.path}_idle{i}.png")
 
-    def play_idle_animation(self,current_screen):
-        if self.idle_frames_count in (0,1):
-            current_screen.blit(self.idle_frames[0],(self.x,self.y))
-        elif self.idle_frames_count in (2,3):
-            current_screen.blit(self.idle_frames[1],(self.x,self.y))
-        else:
-            self.idle_frames_count=0
-        self.idle_frames_count+=1
+    def flip_assets(self, direction):
+        if direction != self.direction:
+            for i in range(self.idle_frames_count):
+                self.idle_frames[i] = pg.transform.flip(self.idle_frames[i], True, False)
+            self.direction=direction
+        
+    def play_idle_animation(self,current_screen,x,y):
+        if self.idle_animation_count < 20:
+            current_screen.blit(self.idle_frames[0],(x,y))
+        elif self.idle_animation_count >= 20:
+            current_screen.blit(self.idle_frames[1],(x,y))
+        if self.idle_animation_count == 40:
+            self.idle_animation_count=0
+        self.idle_animation_count+=1
 
 
 class Doodles(Fighter):
     def __init__(self):
-        super().__init__(0,0, "doodles")
-        print(self.idle_frames)
+        super().__init__("doodles")
+        self.idle_frames_count = 2
+        self.idle_animation_count = 0
+        self.load_idle_images()
 
 class Bowie(Fighter):
-    pass
+    def __init__(self):
+        super().__init__("bowie")
+        self.idle_frames_count = 2
+        self.idle_animation_count = 0
+        self.load_idle_images()
+
+class Ollie(Fighter):
+    def __init__(self):
+        super().__init__("ollie")
+        self.idle_frames_count = 2
+        self.idle_animation_count = 0
+        self.load_idle_images()
+
 class Sprite():
     def __init__(self, left_x, right_x,
                  left_y, right_y, 
@@ -234,8 +263,8 @@ if __name__ == "__main__":
     pg.init()
     pg.font.init()
 
-    FIGHTERS = {"doodles":Doodles()}
-    NUM_OF_FIGHTERS = 1
+    FIGHTERS = ("doodles","bowie","ollie")
+    NUM_OF_FIGHTERS = 3
 
     start_screen = Start_Screen()
     controls_screen = Controls_Screen()
