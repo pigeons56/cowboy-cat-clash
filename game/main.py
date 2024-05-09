@@ -7,7 +7,6 @@ class Screen():
     def __init__(self, background_path,
                  screen_size=SCREEN_SIZE):
         self.background = pg.image.load(background_path)
-        self.selected = None
         self.screen = pg.display.set_mode(screen_size)
         self.running = False
         self.clock = pg.time.Clock()
@@ -22,8 +21,18 @@ class Screen():
     def loop_functions(self):
         pass
 
-    def load(self):
+    def end_loop_functions(self):
         pass
+
+    def check_button_hover(self,array):
+        mouse_x,mouse_y = pg.mouse.get_pos()
+        for i in array:
+            if i.is_clicked(mouse_x,mouse_y):
+                i.clicked = True
+                i.image = pg.image.load(i.clicked_path)
+            else:
+                i.clicked = False
+                i.image = pg.image.load(i.path)
 
     def loop(self):
         self.running = True
@@ -37,48 +46,78 @@ class Screen():
 
             pg.display.update()
             self.clock.tick(60)
+        self.end_loop_functions()
 
 class Controls_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/controls_screen_background.png")
     
+    def end_loop_functions(self):
+        start_screen.loop()
+
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 self.running = False
-                start_screen.loop()
 
 class Credits_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/credits_screen_background.png")
     
+    def end_loop_functions(self):
+        start_screen.loop()
+
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 self.running = False
-                start_screen.loop()
 
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/select_screen_background.png")
-    
+        self.load_portraits()
+
+    def load_portraits(self):
+        self.portraits=[None] * NUM_OF_FIGHTERS
+        x,y=100,100
+        for i in range(NUM_OF_FIGHTERS):
+            self.portraits[i] = Button(FIGHTERS[i],x,x+50,y,y+50,f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait.png",
+                                       f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait_clicked.png")
+            x+=50
+
+    def blit_portraits(self):
+        for i in self.portraits:
+            self.screen.blit(i.image,(i.left_x,i.left_y))
+
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 self.running = False
-                start_screen.loop()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            for i in self.portraits:
+                if i.clicked:
+                    print("clcicked")
+    
+    def end_loop_functions(self):
+        start_screen.loop()
+
+    def loop_functions(self):
+        self.blit_portraits()
+        self.check_button_hover(self.portraits)
 
 class Start_Screen(Screen):
     def __init__(self):
-        self.start_button = Button(100, 200, 50, 100, 
+        self.start_button = Button("start_button",100, 200, 50, 100, 
                               "../assets/buttons/start_button_unclicked.png",
                               "../assets/buttons/start_button_clicked.png")
-        self.controls_button = Button(100, 200, 100, 150, 
+        self.controls_button = Button("controls_button",100, 200, 100, 150, 
                               "../assets/buttons/controls_button_unclicked.png",
                               "../assets/buttons/controls_button_clicked.png")
-        self.credits_button = Button(100, 200, 150, 200, 
+        self.credits_button = Button("credits_button",100, 200, 150, 200, 
                               "../assets/buttons/credits_button_unclicked.png",
                               "../assets/buttons/credits_button_clicked.png")
+        
+        self.buttons = (self.start_button,self.controls_button,self.credits_button)
         
         self.title = Sprite(100, 300, 200, 100, "../assets/text/title.png") 
 
@@ -86,25 +125,33 @@ class Start_Screen(Screen):
     
     def check_events(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self.start_button.is_clicked(event.pos[0],event.pos[1]):
-                self.running = False
-                select_screen.loop()
-            elif self.controls_button.is_clicked(event.pos[0],event.pos[1]):
-                self.running = False
-                controls_screen.loop()        
-            elif self.credits_button.is_clicked(event.pos[0],event.pos[1]):
-                self.running = False
-                credits_screen.loop()        
-
-    def load(self):
-        pass
+            for i in self.buttons:
+                if i.clicked:
+                    self.running = False
+    
+    def end_loop_functions(self):
+        if self.start_button.clicked:
+            select_screen.loop()
+        elif self.credits_button.clicked:
+            credits_screen.loop()
+        elif self.controls_button.clicked:
+            controls_screen.loop()
 
     def loop_functions(self):
         self.screen.blit(self.title.image,(self.title.left_x,self.title.left_y))
         self.screen.blit(self.start_button.image,(self.start_button.left_x, self.start_button.left_y))
         self.screen.blit(self.controls_button.image,(self.controls_button.left_x, self.controls_button.left_y))
         self.screen.blit(self.credits_button.image,(self.credits_button.left_x, self.credits_button.left_y))
+        self.check_button_hover(self.buttons)
 
+class Fighter():
+    pass
+
+class Doodles(Fighter):
+    pass
+
+class Bowie(Fighter):
+    pass
 class Sprite():
     def __init__(self, left_x, right_x,
                  left_y, right_y, 
@@ -116,12 +163,15 @@ class Sprite():
         self.left_y = left_y
         self.right_y = right_y
 
+    
 class Button(Sprite):
-    def __init__(self, left_x, right_x,
+    def __init__(self, name, left_x, right_x,
                  left_y, right_y, 
                  path, clicked_path):
         super().__init__(left_x,right_x,left_y,right_y,path)
         self.clicked_path = clicked_path
+        self.clicked=False
+        self.name = name
 
     def is_clicked(self, pointer_x, pointer_y):
         if (self.left_x <= pointer_x and pointer_x <= self.right_x
@@ -135,6 +185,9 @@ if __name__ == "__main__":
     #Initialize pygame
     pg.init()
     pg.font.init()
+
+    FIGHTERS = ["doodles","bowie"]
+    NUM_OF_FIGHTERS = 2
 
     start_screen = Start_Screen()
     controls_screen = Controls_Screen()
