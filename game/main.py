@@ -48,6 +48,17 @@ class Screen():
             self.clock.tick(60)
         self.end_loop_functions()
 
+class Battle_Screen(Screen):
+    def __init__(self):
+        super().__init__("../assets/backgrounds/battle_screen_background.png")
+        self.player1_x = 0
+        self.player1_y = 50
+
+        self.player2_x = 350
+        self.player2_x = 50
+    
+
+
 class Controls_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/controls_screen_background.png")
@@ -79,7 +90,6 @@ class Select_Screen(Screen):
                               "../assets/buttons/ready_button_clicked.png")
         self.player1_fighter=Fighter("placeholder")
         self.player2_fighter=Fighter("placeholder")
-
         self.load_portraits()
 
     def load_portraits(self):
@@ -93,10 +103,12 @@ class Select_Screen(Screen):
     def blit_idles(self):
         if self.player1_fighter.name != "placeholder":
             self.player1_fighter.flip_assets("right")
-            self.player1_fighter.play_idle_animation(self.screen,0,200)
+            self.player1_fighter.play_idle_animation()
+            self.screen.blit(self.player1_fighter.image,(0,200))
         if self.player2_fighter.name != "placeholder":
-            self.player2_fighter.flip_assets("left")           
-            self.player2_fighter.play_idle_animation(self.screen,600,200)
+            self.player2_fighter.flip_assets("left")
+            self.player2_fighter.play_idle_animation()
+            self.screen.blit(self.player2_fighter.image,(600,200))
 
     def set_player_fighter(self,fighter,player_fighter_var):
         if player_fighter_var.name != fighter:
@@ -129,11 +141,11 @@ class Select_Screen(Screen):
                     elif event.button == 3:
                         self.player2_fighter = self.set_player_fighter(i.name,self.player2_fighter)
             if self.ready_button.is_clicked(event.pos[0],event.pos[1]) and self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
-                print("bye")
                 self.running = False
     
     def end_loop_functions(self):
-        start_screen.loop()
+        battle_screen.loop()
+
 
     def loop_functions(self):
         self.blit_portraits()
@@ -183,9 +195,15 @@ class Start_Screen(Screen):
 
 class Fighter():
     def __init__(self, path):
-        self.path = path
         self.name = path
-        self.direction = "right"
+        
+        if self.name != "placeholder":
+            self.direction = "right"
+            self.path = path
+            self.idle_frames_count = 2
+            self.idle_animation_count = 0
+            self.load_idle_images()
+            self.image = self.idle_frames[0]
 
     def load_idle_images(self):
         self.idle_frames = [None] * self.idle_frames_count
@@ -198,11 +216,11 @@ class Fighter():
                 self.idle_frames[i] = pg.transform.flip(self.idle_frames[i], True, False)
             self.direction=direction
         
-    def play_idle_animation(self,current_screen,x,y):
+    def play_idle_animation(self):
         if self.idle_animation_count < 20:
-            current_screen.blit(self.idle_frames[0],(x,y))
+            self.image = self.idle_frames[0]
         elif self.idle_animation_count >= 20:
-            current_screen.blit(self.idle_frames[1],(x,y))
+            self.image = self.idle_frames[1]
         if self.idle_animation_count == 40:
             self.idle_animation_count=0
         self.idle_animation_count+=1
@@ -211,23 +229,14 @@ class Fighter():
 class Doodles(Fighter):
     def __init__(self):
         super().__init__("doodles")
-        self.idle_frames_count = 2
-        self.idle_animation_count = 0
-        self.load_idle_images()
 
 class Bowie(Fighter):
     def __init__(self):
         super().__init__("bowie")
-        self.idle_frames_count = 2
-        self.idle_animation_count = 0
-        self.load_idle_images()
 
 class Ollie(Fighter):
     def __init__(self):
         super().__init__("ollie")
-        self.idle_frames_count = 2
-        self.idle_animation_count = 0
-        self.load_idle_images()
 
 class Sprite():
     def __init__(self, left_x, right_x,
@@ -270,5 +279,6 @@ if __name__ == "__main__":
     controls_screen = Controls_Screen()
     credits_screen = Credits_Screen()
     select_screen = Select_Screen()
+    battle_screen = Battle_Screen()
 
     start_screen.loop()
