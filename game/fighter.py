@@ -3,11 +3,15 @@ FIGHTERS = ("doodles","bowie","ollie")
 NUM_OF_FIGHTERS = 3
 
 class Fighter():
-    def __init__(self, path):
+    def __init__(self, path,movespeed=1,x=0,y=0):
         self.name = path
         
         if self.name != "placeholder":
+            self.frames=[]
             self.direction = "right"
+            self.movespeed = movespeed
+            self.x=x
+            self.y=y
             self.path = path
             self.idle_frames_count = 2
             self.idle_animation_count = 0
@@ -37,12 +41,12 @@ class Fighter():
 
 class Doodles(Fighter):
     def __init__(self):
-        super().__init__("doodles")
+        super().__init__("doodles",6)
 
 class Bowie(Fighter):
     def __init__(self):
-        super().__init__("bowie")
+        super().__init__("bowie",4)
 
 class Ollie(Fighter):
     def __init__(self):
-        super().__init__("ollie")
+        super().__init__("ollie",9)

@@ -52,13 +52,52 @@ class Screen():
         self.end_loop_functions()
 
 class Battle_Screen(Screen):
-    def __init__(self):
+    def __init__(self,player1,player2):
         super().__init__("../assets/backgrounds/battle_screen_background.png")
-        self.player1_x = 0
-        self.player1_y = 50
+        
+        self.player1_fighter = player1
+        self.player1_fighter.x = 0
+        self.player1_fighter.y = 300
+        
+        self.player2_fighter = player2
+        self.player2_fighter.x = 700
+        self.player2_fighter.y = 300
 
-        self.player2_x = 350
-        self.player2_x = 50
+    def blit_fighters(self):
+        self.player1_fighter.flip_assets("right")
+        self.screen.blit(self.player1_fighter.image,(self.player1_fighter.x,self.player1_fighter.y))
+        self.player2_fighter.flip_assets("left")
+        self.screen.blit(self.player2_fighter.image,(self.player2_fighter.x,self.player2_fighter.y))
+
+    def check_events(self, event):
+        pass
+
+    def move_fighters(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_RIGHT] and self.player2_fighter.x < SCREEN_SIZE[0] - self.player2_fighter.movespeed:
+            self.player2_fighter.x+=self.player2_fighter.movespeed
+        elif keys[pg.K_LEFT] and self.player2_fighter.x > 0 + self.player2_fighter.movespeed:
+            self.player2_fighter.x-=self.player2_fighter.movespeed
+        
+        if keys[pg.K_d] and self.player1_fighter.x < SCREEN_SIZE[0] - self.player1_fighter.movespeed:
+            self.player1_fighter.x+=self.player1_fighter.movespeed
+        elif keys[pg.K_a] and self.player1_fighter.x > 0 + self.player1_fighter.movespeed:
+            self.player1_fighter.x-=self.player1_fighter.movespeed
+
+    def check_fighter_x(self):
+        if self.player1_fighter.x > self.player2_fighter.x:
+            print("f1")
+            self.player1_fighter.flip_assets("left")
+            self.player2_fighter.flip_assets("right")
+        else:
+            print("f2")
+            self.player1_fighter.flip_assets("right")
+            self.player2_fighter.flip_assets("left")
+
+    def loop_functions(self):
+        self.blit_fighters()
+        self.move_fighters()
+        self.check_fighter_x()
     
 
 
@@ -133,9 +172,6 @@ class Select_Screen(Screen):
             self.screen.blit(self.ready_button.image,(self.ready_button.left_x,self.ready_button.left_y))
 
     def check_events(self, event):
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                self.running = False
         if event.type == pg.MOUSEBUTTONDOWN:
             for i in self.portraits:
                 if i.clicked:
@@ -147,7 +183,7 @@ class Select_Screen(Screen):
                 self.running = False
     
     def end_loop_functions(self):
-        Battle_Screen().loop()
+        Battle_Screen(self.player1_fighter,self.player2_fighter).loop()
 
 
     def loop_functions(self):
