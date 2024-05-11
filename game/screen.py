@@ -2,7 +2,20 @@ import pygame as pg
 import sys
 from sprite import *
 from fighter import *
+from animation import *
 
+PLAYER1_CONTROLS = {"up": pg.K_w,
+                     "down": pg.K_s,
+                     "left": pg.K_a,
+                     "right": pg.K_d,
+                     "attack": pg.K_q,
+                     "special": pg.K_e}
+PLAYER2_CONTROLS = {"up": pg.K_UP,
+                     "down": pg.K_DOWN,
+                     "left": pg.K_LEFT,
+                     "right": pg.K_RIGHT,
+                     "attack": pg.K_KP_ENTER,
+                     "special": pg.K_RSHIFT}
 
 SCREEN_SIZE = (800,400)
 
@@ -64,40 +77,62 @@ class Battle_Screen(Screen):
         self.player2_fighter.y = 300
 
     def blit_fighters(self):
-        self.player1_fighter.flip_assets("right")
-        self.screen.blit(self.player1_fighter.image,(self.player1_fighter.x,self.player1_fighter.y))
-        self.player2_fighter.flip_assets("left")
-        self.screen.blit(self.player2_fighter.image,(self.player2_fighter.x,self.player2_fighter.y))
+        self.screen.blit(self.player1_fighter.animation.image,(self.player1_fighter.x,self.player1_fighter.y))
+        self.screen.blit(self.player2_fighter.animation.image,(self.player2_fighter.x,self.player2_fighter.y))
 
     def check_events(self, event):
         pass
 
-    def move_fighters(self):
+    def check_keys(self):
         keys = pg.key.get_pressed()
-        if keys[pg.K_RIGHT] and self.player2_fighter.x < SCREEN_SIZE[0] - self.player2_fighter.movespeed:
-            self.player2_fighter.x+=self.player2_fighter.movespeed
-        elif keys[pg.K_LEFT] and self.player2_fighter.x > 0 + self.player2_fighter.movespeed:
-            self.player2_fighter.x-=self.player2_fighter.movespeed
-        
-        if keys[pg.K_d] and self.player1_fighter.x < SCREEN_SIZE[0] - self.player1_fighter.movespeed:
+        self.move_fighters(keys)
+
+    def move_fighters(self,keys): 
+        if keys[PLAYER1_CONTROLS["right"]] and self.can_fighter_move(self.player1_fighter,self.player2_fighter,"right"):
             self.player1_fighter.x+=self.player1_fighter.movespeed
-        elif keys[pg.K_a] and self.player1_fighter.x > 0 + self.player1_fighter.movespeed:
+        elif keys[PLAYER1_CONTROLS["left"]] and self.can_fighter_move(self.player1_fighter,self.player2_fighter,"left"):
             self.player1_fighter.x-=self.player1_fighter.movespeed
+
+        if keys[PLAYER2_CONTROLS["right"]] and self.can_fighter_move(self.player2_fighter,self.player1_fighter,"right"):
+            self.player2_fighter.x+=self.player2_fighter.movespeed
+        elif keys[PLAYER2_CONTROLS["left"]] and self.can_fighter_move(self.player2_fighter,self.player1_fighter,"left"):
+            self.player2_fighter.x-=self.player2_fighter.movespeed
+    
+    def can_fighter_move(self, this_fighter, other_fighter, move_direction):
+        return self.check_screen_bounds(this_fighter,move_direction) and self.check_fighter_collision(this_fighter, other_fighter, move_direction)
+    
+    def check_screen_bounds(self, this_fighter,move_direction):
+
+        if move_direction == "right" and this_fighter.x + this_fighter.movespeed + this_fighter.animation.width > SCREEN_SIZE[0]:
+            return False
+        elif move_direction == "left" and this_fighter.x - this_fighter.movespeed < 0:
+            return False
+        
+        return True
+    
+    def check_fighter_collision(self, this_fighter, other_fighter, move_direction):
+        img_direction = this_fighter.animation.direction
+        if move_direction != img_direction:
+            return True
+        elif move_direction == "right" and this_fighter.x + this_fighter.movespeed + this_fighter.animation.width  >= other_fighter.x:
+            return False
+        elif move_direction == "left" and this_fighter.x - this_fighter.movespeed <= other_fighter.x + other_fighter.animation.width:
+            return False
+        
+        return True
 
     def check_fighter_x(self):
         if self.player1_fighter.x > self.player2_fighter.x:
-            print("f1")
-            self.player1_fighter.flip_assets("left")
-            self.player2_fighter.flip_assets("right")
+            self.player1_fighter.animation.check_direction("left")
+            self.player2_fighter.animation.check_direction("right")
         else:
-            print("f2")
-            self.player1_fighter.flip_assets("right")
-            self.player2_fighter.flip_assets("left")
+            self.player1_fighter.animation.check_direction("right")
+            self.player2_fighter.animation.check_direction("left")
 
     def loop_functions(self):
-        self.blit_fighters()
-        self.move_fighters()
+        self.blit_fighters()     
         self.check_fighter_x()
+        self.check_keys()
     
 
 
@@ -144,22 +179,20 @@ class Select_Screen(Screen):
 
     def blit_idles(self):
         if self.player1_fighter.name != "placeholder":
-            self.player1_fighter.flip_assets("right")
-            self.player1_fighter.play_idle_animation()
-            self.screen.blit(self.player1_fighter.image,(0,200))
+            self.player1_fighter.animation.play_idle()
+            self.screen.blit(self.player1_fighter.animation.image,(0,200))
         if self.player2_fighter.name != "placeholder":
-            self.player2_fighter.flip_assets("left")
-            self.player2_fighter.play_idle_animation()
-            self.screen.blit(self.player2_fighter.image,(600,200))
+            self.player2_fighter.animation.play_idle()
+            self.screen.blit(self.player2_fighter.animation.image,(600,200))
 
-    def set_player_fighter(self,fighter,player_fighter_var):
+    def set_player_fighter(self,fighter,player_fighter_var, direction):
         if player_fighter_var.name != fighter:
             if fighter == "doodles":
-                player_fighter_var = Doodles()
+                player_fighter_var = Doodles(direction)
             elif fighter == "bowie":
-                player_fighter_var = Bowie()
+                player_fighter_var = Bowie(direction)
             elif fighter == "ollie":
-                player_fighter_var = Ollie()
+                player_fighter_var = Ollie(direction)
             
         return player_fighter_var
 
@@ -176,9 +209,9 @@ class Select_Screen(Screen):
             for i in self.portraits:
                 if i.clicked:
                     if event.button == 1:
-                        self.player1_fighter = self.set_player_fighter(i.name,self.player1_fighter)
+                        self.player1_fighter = self.set_player_fighter(i.name,self.player1_fighter, "right")
                     elif event.button == 3:
-                        self.player2_fighter = self.set_player_fighter(i.name,self.player2_fighter)
+                        self.player2_fighter = self.set_player_fighter(i.name,self.player2_fighter, "left")
             if self.ready_button.is_clicked(event.pos[0],event.pos[1]) and self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
                 self.running = False
     

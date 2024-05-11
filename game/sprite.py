@@ -5,13 +5,12 @@ class Sprite():
                  left_y, right_y, 
                  path):
         self.path = path
-        self.image = pg.image.load(self.path)
         self.left_x = left_x
         self.right_x = right_x
         self.left_y = left_y
         self.right_y = right_y
+        self.image = pg.image.load(self.path)
 
-    
 class Button(Sprite):
     def __init__(self, name, left_x, right_x,
                  left_y, right_y, 
