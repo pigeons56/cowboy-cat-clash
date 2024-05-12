@@ -87,16 +87,50 @@ class Battle_Screen(Screen):
         keys = pg.key.get_pressed()
         self.move_fighters(keys)
 
-    def move_fighters(self,keys): 
-        if keys[PLAYER1_CONTROLS["right"]] and self.can_fighter_move(self.player1_fighter,self.player2_fighter,"right"):
-            self.player1_fighter.x+=self.player1_fighter.movespeed
-        elif keys[PLAYER1_CONTROLS["left"]] and self.can_fighter_move(self.player1_fighter,self.player2_fighter,"left"):
-            self.player1_fighter.x-=self.player1_fighter.movespeed
+    def is_input(self, player_num, keys):
+        if player_num == 1: controls = list(PLAYER1_CONTROLS.values())
+        else: controls = list(PLAYER2_CONTROLS.values())
 
-        if keys[PLAYER2_CONTROLS["right"]] and self.can_fighter_move(self.player2_fighter,self.player1_fighter,"right"):
-            self.player2_fighter.x+=self.player2_fighter.movespeed
-        elif keys[PLAYER2_CONTROLS["left"]] and self.can_fighter_move(self.player2_fighter,self.player1_fighter,"left"):
-            self.player2_fighter.x-=self.player2_fighter.movespeed
+        for i in list(controls):
+            if keys[i]:
+                return True
+        
+        return False
+    
+    def play_fighter_move(self, player_fighter, move_direction):
+        img_direction = player_fighter.animation.direction
+
+        if img_direction == move_direction:
+            player_fighter.animation.play_move_forward()
+        else:
+            player_fighter.animation.play_move_backward()
+    
+    def move_fighters(self,keys): 
+        if not self.is_input(1,keys):
+            self.player1_fighter.animation.play_idle()
+        else:
+            if keys[PLAYER1_CONTROLS["right"]]:
+                move_direction = "right"
+                if self.can_fighter_move(self.player1_fighter,self.player2_fighter,move_direction):
+                    self.player1_fighter.x+=self.player1_fighter.movespeed
+            elif keys[PLAYER1_CONTROLS["left"]]:
+                move_direction = "left"
+                if self.can_fighter_move(self.player1_fighter,self.player2_fighter,move_direction):
+                    self.player1_fighter.x-=self.player1_fighter.movespeed
+            self.play_fighter_move(self.player1_fighter, move_direction)
+
+        if not self.is_input(2,keys):
+            self.player2_fighter.animation.play_idle()
+        else:
+            if keys[PLAYER2_CONTROLS["right"]]:
+                move_direction = "right"
+                if self.can_fighter_move(self.player2_fighter,self.player1_fighter,move_direction):
+                    self.player2_fighter.x+=self.player2_fighter.movespeed
+            elif keys[PLAYER2_CONTROLS["left"]]:
+                move_direction = "left"
+                if self.can_fighter_move(self.player2_fighter,self.player1_fighter,move_direction):
+                    self.player2_fighter.x-=self.player2_fighter.movespeed
+            self.play_fighter_move(self.player2_fighter, move_direction)
     
     def can_fighter_move(self, this_fighter, other_fighter, move_direction):
         return self.check_screen_bounds(this_fighter,move_direction) and self.check_fighter_collision(this_fighter, other_fighter, move_direction)
