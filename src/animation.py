@@ -1,9 +1,11 @@
 import pygame as pg
 import os
+
 class Animation():
     def __init__(self, width, 
-                 path,direction):
+                 path,direction, height = 100):
         self.width = width
+        self.height = height
         self.path = path
         self.load_all_images()
         self.direction = "right"
@@ -40,7 +42,6 @@ class Animation():
 
     def check_direction(self, direction):
         if self.direction != direction:
-            print("FLIP")
             self.jump_images = self.flip_images(self.jump_images)
             self.idle_images = self.flip_images(self.idle_images)
             self.side_attack_images = self.flip_images(self.side_attack_images)
@@ -85,3 +86,6 @@ class Animation():
             self.count+=1
         if self.count >= 40:
             self.reset_count()
+
+    def play_jump(self):
+        self.image = self.jump_images[0]

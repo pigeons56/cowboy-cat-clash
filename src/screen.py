@@ -17,6 +17,8 @@ PLAYER2_CONTROLS = {"up": pg.K_UP,
                      "attack": pg.K_KP_ENTER,
                      "special": pg.K_RSHIFT}
 
+GROUND_Y = 300
+
 SCREEN_SIZE = (800,400)
 
 class Screen():
@@ -70,11 +72,11 @@ class Battle_Screen(Screen):
         
         self.player1_fighter = player1
         self.player1_fighter.x = 0
-        self.player1_fighter.y = 300
+        self.player1_fighter.y = GROUND_Y
         
         self.player2_fighter = player2
         self.player2_fighter.x = 700
-        self.player2_fighter.y = 300
+        self.player2_fighter.y = GROUND_Y
 
     def blit_fighters(self):
         self.screen.blit(self.player1_fighter.animation.image,(self.player1_fighter.x,self.player1_fighter.y))
@@ -85,7 +87,11 @@ class Battle_Screen(Screen):
 
     def check_keys(self):
         keys = pg.key.get_pressed()
-        self.move_fighters(keys)
+        self.move_fighters(keys,self.player1_fighter,self.player2_fighter,1,PLAYER1_CONTROLS)
+        self.jump_fighters(keys, self.player1_fighter, PLAYER1_CONTROLS)
+
+        self.move_fighters(keys,self.player2_fighter,self.player1_fighter,2,PLAYER2_CONTROLS)
+        self.jump_fighters(keys, self.player2_fighter, PLAYER2_CONTROLS)
 
     def is_input(self, player_num, keys):
         if player_num == 1: controls = list(PLAYER1_CONTROLS.values())
@@ -105,32 +111,41 @@ class Battle_Screen(Screen):
         else:
             player_fighter.animation.play_move_backward()
     
-    def move_fighters(self,keys): 
-        if not self.is_input(1,keys):
-            self.player1_fighter.animation.play_idle()
-        else:
-            if keys[PLAYER1_CONTROLS["right"]]:
-                move_direction = "right"
-                if self.can_fighter_move(self.player1_fighter,self.player2_fighter,move_direction):
-                    self.player1_fighter.x+=self.player1_fighter.movespeed
-            elif keys[PLAYER1_CONTROLS["left"]]:
-                move_direction = "left"
-                if self.can_fighter_move(self.player1_fighter,self.player2_fighter,move_direction):
-                    self.player1_fighter.x-=self.player1_fighter.movespeed
-            self.play_fighter_move(self.player1_fighter, move_direction)
+    def jump_fighters(self,keys, this_fighter, player_controls):
+        if keys[player_controls["up"]] and not this_fighter.is_jump:
+            this_fighter.is_jump = True
+        if this_fighter.is_jump:
+            if this_fighter.jump_count >= 80:
+                this_fighter.jump_count = 0
+                this_fighter.is_jump = False
+            elif this_fighter.jump_count < 40:
+                this_fighter.y -= this_fighter.jump_height
+                this_fighter.animation.play_jump()
+                this_fighter.jump_count+=1
+            elif this_fighter.jump_count >= 40:
+                this_fighter.y += this_fighter.jump_height
+                this_fighter.animation.play_jump()
+                this_fighter.jump_count+=1                   
 
-        if not self.is_input(2,keys):
-            self.player2_fighter.animation.play_idle()
+    def move_fighters(self,keys, this_fighter, other_fighter, fighter_num, player_controls):
+        tried_move = False 
+        if not self.is_input(fighter_num,keys):
+            this_fighter.animation.play_idle()
         else:
-            if keys[PLAYER2_CONTROLS["right"]]:
+            if keys[player_controls["right"]]:
                 move_direction = "right"
-                if self.can_fighter_move(self.player2_fighter,self.player1_fighter,move_direction):
-                    self.player2_fighter.x+=self.player2_fighter.movespeed
-            elif keys[PLAYER2_CONTROLS["left"]]:
+                tried_move = True
+                if self.can_fighter_move(this_fighter,other_fighter,move_direction):
+                    this_fighter.x+=this_fighter.movespeed
+            
+            elif keys[player_controls["left"]]:
                 move_direction = "left"
-                if self.can_fighter_move(self.player2_fighter,self.player1_fighter,move_direction):
-                    self.player2_fighter.x-=self.player2_fighter.movespeed
-            self.play_fighter_move(self.player2_fighter, move_direction)
+                tried_move = True
+                if self.can_fighter_move(this_fighter,other_fighter,move_direction):
+                    this_fighter.x-=this_fighter.movespeed
+            
+            if tried_move:
+                self.play_fighter_move(this_fighter, move_direction)
     
     def can_fighter_move(self, this_fighter, other_fighter, move_direction):
         return self.check_screen_bounds(this_fighter,move_direction) and self.check_fighter_collision(this_fighter, other_fighter, move_direction)
@@ -146,14 +161,19 @@ class Battle_Screen(Screen):
     
     def check_fighter_collision(self, this_fighter, other_fighter, move_direction):
         img_direction = this_fighter.animation.direction
+
         if move_direction != img_direction:
             return True
-        elif move_direction == "right" and this_fighter.x + this_fighter.movespeed + this_fighter.animation.width  >= other_fighter.x:
-            return False
-        elif move_direction == "left" and this_fighter.x - this_fighter.movespeed <= other_fighter.x + other_fighter.animation.width:
-            return False
         
-        return True
+        if move_direction == "right" and this_fighter.x + this_fighter.movespeed + this_fighter.animation.width < other_fighter.x:
+            return True
+        elif move_direction == "left" and this_fighter.x - this_fighter.movespeed > other_fighter.x + other_fighter.animation.width:
+            return True
+        
+        if this_fighter.y + 100 < other_fighter.y or this_fighter.y > other_fighter.y + 100:
+            return True
+        
+        return False
 
     def check_fighter_x(self):
         if self.player1_fighter.x > self.player2_fighter.x:
