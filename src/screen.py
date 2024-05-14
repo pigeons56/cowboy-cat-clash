@@ -17,7 +17,7 @@ PLAYER2_CONTROLS = {"up": pg.K_UP,
                      "attack": pg.K_KP_ENTER,
                      "special": pg.K_RSHIFT}
 
-GROUND_Y = 300
+GROUND_Y = 285
 
 SCREEN_SIZE = (800,400)
 
@@ -68,15 +68,17 @@ class Screen():
 
 class Battle_Screen(Screen):
     def __init__(self,player1,player2):
-        super().__init__("../assets/backgrounds/battle_screen_background.png")
+        super().__init__("../assets/backgrounds/battle_background.png")
         
         self.player1_fighter = player1
         self.player1_fighter.x = 0
         self.player1_fighter.y = GROUND_Y
+        self.player1_fighter.ground = GROUND_Y
         
         self.player2_fighter = player2
         self.player2_fighter.x = 700
         self.player2_fighter.y = GROUND_Y
+        self.player1_fighter.ground = GROUND_Y
 
     def blit_fighters(self):
         self.screen.blit(self.player1_fighter.animation.image,(self.player1_fighter.x,self.player1_fighter.y))
@@ -179,8 +181,8 @@ class Battle_Screen(Screen):
         elif move_direction == "left" and this_fighter.x - this_fighter.movespeed > other_fighter.x + other_fighter.animation.width:
             return True
         
-        if this_fighter.y + 100 <= other_fighter.y or this_fighter.y >= other_fighter.y + 100:
-            return True
+        if this_fighter.y + this_fighter.animation.height <= other_fighter.y or this_fighter.y >= other_fighter.y + other_fighter.animation.height:
+            return True           
         
         return False
 
@@ -201,7 +203,7 @@ class Battle_Screen(Screen):
 
 class Controls_Screen(Screen):
     def __init__(self):
-        super().__init__("../assets/backgrounds/controls_screen_background.png")
+        super().__init__("../assets/backgrounds/main_background.png")
     
     def end_loop_functions(self):
         Start_Screen().loop()
@@ -213,7 +215,7 @@ class Controls_Screen(Screen):
 
 class Credits_Screen(Screen):
     def __init__(self):
-        super().__init__("../assets/backgrounds/credits_screen_background.png")
+        super().__init__("../assets/backgrounds/main_background.png")
     
     def end_loop_functions(self):
         Start_Screen().loop()
@@ -225,7 +227,7 @@ class Credits_Screen(Screen):
 
 class Select_Screen(Screen):
     def __init__(self):
-        super().__init__("../assets/backgrounds/select_screen_background.png")
+        super().__init__("../assets/backgrounds/main_background.png")
         self.ready_button = Button("ready_button",200,400,300,400,"../assets/buttons/ready_button_unclicked.png",
                               "../assets/buttons/ready_button_clicked.png")
         self.player1_fighter=Fighter("placeholder")
@@ -251,11 +253,11 @@ class Select_Screen(Screen):
     def set_player_fighter(self,fighter,player_fighter_var, direction):
         if player_fighter_var.name != fighter:
             if fighter == "doodles":
-                player_fighter_var = Doodles(direction=direction,ground=GROUND_Y)
+                player_fighter_var = Doodles(direction=direction)
             elif fighter == "bowie":
-                player_fighter_var = Bowie(direction=direction,ground=GROUND_Y)
+                player_fighter_var = Bowie(direction=direction)
             elif fighter == "ollie":
-                player_fighter_var = Ollie(direction=direction,ground=GROUND_Y)
+                player_fighter_var = Ollie(direction=direction)
             
         return player_fighter_var
 
@@ -305,7 +307,7 @@ class Start_Screen(Screen):
         
         self.title = Sprite(100, 300, 200, 100, "../assets/text/title.png") 
 
-        super().__init__("../assets/backgrounds/start_screen_background.png")
+        super().__init__("../assets/backgrounds/main_background.png")
     
     def check_events(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:

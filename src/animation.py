@@ -2,8 +2,8 @@ import pygame as pg
 import os
 
 class Animation():
-    def __init__(self, width, 
-                 path,direction, height = 100):
+    def __init__(self, width, height,
+                 path,direction):
         self.width = width
         self.height = height
         self.path = path
