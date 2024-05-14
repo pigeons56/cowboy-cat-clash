@@ -203,8 +203,12 @@ class Battle_Screen(Screen):
 
 class Controls_Screen(Screen):
     def __init__(self):
+        self.controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
         super().__init__("../assets/backgrounds/main_background.png")
-    
+
+    def loop_functions(self):
+        self.screen.blit(self.controls_title.image,(self.controls_title.left_x,self.controls_title.left_y))
+
     def end_loop_functions(self):
         Start_Screen().loop()
 
@@ -216,7 +220,11 @@ class Controls_Screen(Screen):
 class Credits_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-    
+        self.credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
+
+    def loop_functions(self):
+        self.screen.blit(self.credits_title.image,(self.credits_title.left_x,self.credits_title.left_y))
+
     def end_loop_functions(self):
         Start_Screen().loop()
 
@@ -228,7 +236,7 @@ class Credits_Screen(Screen):
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-        self.ready_button = Button("ready_button",200,400,300,400,"../assets/buttons/ready_button_unclicked.png",
+        self.ready_button = Button("ready_button",200,200,300,100,"../assets/buttons/ready_button_unclicked.png",
                               "../assets/buttons/ready_button_clicked.png")
         self.player1_fighter=Fighter("placeholder")
         self.player2_fighter=Fighter("placeholder")
@@ -238,8 +246,8 @@ class Select_Screen(Screen):
         self.portraits=[None] * NUM_OF_FIGHTERS
         x,y=100,100
         for i in range(NUM_OF_FIGHTERS):
-            self.portraits[i] = Button(FIGHTERS[i],x,x+50,y,y+50,f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait_unclicked.png",
-                                       f"../assets/{FIGHTERS[i]}/{FIGHTERS[i]}_portrait_clicked.png")
+            self.portraits[i] = Button(FIGHTERS[i],x,50,y,50,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
+                                       f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_clicked.png")
             x+=50
 
     def blit_idles(self):
@@ -293,19 +301,22 @@ class Select_Screen(Screen):
 
 class Start_Screen(Screen):
     def __init__(self):
-        self.start_button = Button("start_button",100, 200, 50, 100, 
+        self.start_button = Button("start_button",310, 170, 200, 60, 
                               "../assets/buttons/start_button_unclicked.png",
                               "../assets/buttons/start_button_clicked.png")
-        self.controls_button = Button("controls_button",100, 200, 100, 150, 
+        self.controls_button = Button("controls_button",265, 270, 265, 60, 
                               "../assets/buttons/controls_button_unclicked.png",
                               "../assets/buttons/controls_button_clicked.png")
-        self.credits_button = Button("credits_button",100, 200, 150, 200, 
+        self.credits_button = Button("credits_button",290, 225, 330, 60, 
                               "../assets/buttons/credits_button_unclicked.png",
                               "../assets/buttons/credits_button_clicked.png")
         
         self.buttons = (self.start_button,self.controls_button,self.credits_button)
         
-        self.title = Sprite(100, 300, 200, 100, "../assets/text/title.png") 
+        self.start_title = Sprite(200, 400, 5, 180, "../assets/text/start_title.png")
+        self.start_button_extra = Sprite(482,35,213,35,"../assets/extra/start_button_extra.png")
+        self.controls_button_extra = Sprite(222,70,234,80,"../assets/extra/controls_button_extra.png")
+        self.credits_button_extra = Sprite(510,40,350,35,"../assets/extra/credits_button_extra.png")
 
         super().__init__("../assets/backgrounds/main_background.png")
     
@@ -324,8 +335,15 @@ class Start_Screen(Screen):
             Controls_Screen().loop()
 
     def loop_functions(self):
-        self.screen.blit(self.title.image,(self.title.left_x,self.title.left_y))
+        self.screen.blit(self.start_title.image,(self.start_title.left_x,self.start_title.left_y))
+        
         self.screen.blit(self.start_button.image,(self.start_button.left_x, self.start_button.left_y))
+        self.screen.blit(self.start_button_extra.image,(self.start_button_extra.left_x, self.start_button_extra.left_y))
+        
         self.screen.blit(self.controls_button.image,(self.controls_button.left_x, self.controls_button.left_y))
+        self.screen.blit(self.controls_button_extra.image,(self.controls_button_extra.left_x, self.controls_button_extra.left_y))
+        
         self.screen.blit(self.credits_button.image,(self.credits_button.left_x, self.credits_button.left_y))
+        self.screen.blit(self.credits_button_extra.image,(self.credits_button_extra.left_x, self.credits_button_extra.left_y))        
+        
         self.check_button_hover(self.buttons)
