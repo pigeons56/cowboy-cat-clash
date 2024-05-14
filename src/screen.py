@@ -3,6 +3,8 @@ import sys
 from sprite import *
 from fighter import *
 from animation import *
+from music import *
+from random import choice
 
 PLAYER1_CONTROLS = {"up": pg.K_w,
                      "down": pg.K_s,
@@ -64,6 +66,7 @@ class Screen():
 
             pg.display.update()
             self.clock.tick(60)
+        Music().stop()
         self.end_loop_functions()
 
 class Battle_Screen(Screen):
@@ -79,6 +82,10 @@ class Battle_Screen(Screen):
         self.player2_fighter.x = 700
         self.player2_fighter.y = GROUND_Y
         self.player1_fighter.ground = GROUND_Y
+
+        self.music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
+                           "western_adventures.mp3","western_cowboy_ride.mp3",
+                           "western.mp3")
 
     def blit_fighters(self):
         self.screen.blit(self.player1_fighter.animation.image,(self.player1_fighter.x,self.player1_fighter.y))
@@ -198,6 +205,7 @@ class Battle_Screen(Screen):
         self.blit_fighters()     
         self.check_fighter_x()
         self.check_keys()
+        Music().load_and_continue_play(choice(self.music_list))
     
 
 
@@ -205,6 +213,7 @@ class Controls_Screen(Screen):
     def __init__(self):
         self.controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
         super().__init__("../assets/backgrounds/main_background.png")
+        Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
         self.screen.blit(self.controls_title.image,(self.controls_title.left_x,self.controls_title.left_y))
@@ -221,6 +230,7 @@ class Credits_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
         self.credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
+        Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
         self.screen.blit(self.credits_title.image,(self.credits_title.left_x,self.credits_title.left_y))
@@ -241,6 +251,8 @@ class Select_Screen(Screen):
         self.player1_fighter=Fighter("placeholder")
         self.player2_fighter=Fighter("placeholder")
         self.load_portraits()
+
+        Music().load_and_play_infinite("rough_n_ready.mp3")
 
     def load_portraits(self):
         self.portraits=[None] * NUM_OF_FIGHTERS
@@ -317,6 +329,8 @@ class Start_Screen(Screen):
         self.start_button_extra = Sprite(482,35,213,35,"../assets/extra/start_button_extra.png")
         self.controls_button_extra = Sprite(222,70,234,80,"../assets/extra/controls_button_extra.png")
         self.credits_button_extra = Sprite(510,40,350,35,"../assets/extra/credits_button_extra.png")
+        
+        Music().load_and_play_infinite("mexican_cowboys.mp3")
 
         super().__init__("../assets/backgrounds/main_background.png")
     
