@@ -27,18 +27,38 @@ class Animation():
     def load_side_attack_images(self):
         self.side_attack_images = self.load_images(f"{self.path}/side_attack",[])
     
+    def load_up_attack_images(self):
+        self.up_attack_images = self.load_images(f"{self.path}/up_attack",[])
+    
+    def load_down_attack_images(self):
+        self.down_attack_images = self.load_images(f"{self.path}/down_attack",[])
+
+    def load_block_images(self):
+        self.block_images = self.load_images(f"{self.path}/block",[])
+
     def load_move_forward_images(self):
         self.move_forward_images = self.load_images(f"{self.path}/move_forward",[])
     
     def load_move_backward_images(self):
         self.move_backward_images = self.load_images(f"{self.path}/move_backward",[])
+
+    def load_defeat_images(self):
+        self.defeat_images = self.load_images(f"{self.path}/defeat",[])
+
+    def load_victory_images(self):
+        self.victory_images = self.load_images(f"{self.path}/victory",[])
     
     def load_all_images(self):
         self.load_jump_images()
         self.load_idle_images()
         self.load_side_attack_images()
+        self.load_up_attack_images()
+        self.load_down_attack_images()
+        self.load_block_images()
         self.load_move_forward_images()
         self.load_move_backward_images()
+        self.load_defeat_images()
+        self.load_victory_images()
 
     def check_direction(self, direction):
         if self.direction != direction:
@@ -89,3 +109,10 @@ class Animation():
 
     def play_jump(self):
         self.image = self.jump_images[0]
+
+    def play_side_attack(self):
+        self.image = self.side_attack_images[0]
+
+
+    def play_up_attack(self):
+        self.image = self.up_attack_images[0]       

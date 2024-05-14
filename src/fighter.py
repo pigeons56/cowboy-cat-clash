@@ -17,6 +17,9 @@ class Fighter():
             self.jump_height = jump_height
             self.jump_count = 0
             self.is_jump = False
+            self.is_attack = False
+            self.attack_duration = 10
+            self.attack_count = 0
             self.animation = Animation(width,height,self.path, self.direction)
 
 

@@ -10,14 +10,12 @@ PLAYER1_CONTROLS = {"up": pg.K_w,
                      "down": pg.K_s,
                      "left": pg.K_a,
                      "right": pg.K_d,
-                     "attack": pg.K_q,
-                     "special": pg.K_e}
+                     "attack": pg.K_q}
 PLAYER2_CONTROLS = {"up": pg.K_UP,
                      "down": pg.K_DOWN,
                      "left": pg.K_LEFT,
                      "right": pg.K_RIGHT,
-                     "attack": pg.K_KP_ENTER,
-                     "special": pg.K_RSHIFT}
+                     "attack": pg.K_SLASH}
 
 GROUND_Y = 285
 
@@ -100,10 +98,27 @@ class Battle_Screen(Screen):
         self.check_all_fighter_inputs(keys,self.player2_fighter,self.player1_fighter,2,PLAYER2_CONTROLS)
 
     def check_all_fighter_inputs(self,keys,this_fighter,other_fighter,fighter_num,player_controls):
-        self.move_fighters(keys,this_fighter,other_fighter,fighter_num,player_controls)
+        if not this_fighter.is_attack:
+            self.move_fighters(keys,this_fighter,other_fighter,fighter_num,player_controls)
         self.set_fighter_ground(this_fighter, other_fighter)
         self.jump_fighters(keys, this_fighter, player_controls)
         self.fall_fighters(this_fighter)
+        self.attack_fighters(keys,this_fighter,player_controls)
+
+    def attack_fighters(self,keys,this_fighter,player_controls):
+        if keys[player_controls["attack"]] and keys[player_controls["up"]]:
+            this_fighter.is_attack = True
+            this_fighter.animation.play_up_attack()
+        elif (keys[player_controls["attack"]] and keys[player_controls["right"]]):
+            this_fighter.is_attack = True
+            this_fighter.animation.play_side_attack()
+        if this_fighter.is_attack:
+            if this_fighter.attack_count == this_fighter.attack_duration:
+                this_fighter.attack_count = 0
+                this_fighter.is_attack = False
+            else:
+                this_fighter.attack_count+=1
+        
 
     def is_input(self, player_num, keys):
         if player_num == 1: controls = list(PLAYER1_CONTROLS.values())
@@ -124,7 +139,7 @@ class Battle_Screen(Screen):
             player_fighter.animation.play_move_backward()
     
     def jump_fighters(self,keys, this_fighter, player_controls):
-        if keys[player_controls["up"]] and not this_fighter.is_jump and this_fighter.y == this_fighter.ground:
+        if keys[player_controls["up"]] and not this_fighter.is_jump and this_fighter.y == this_fighter.ground and not this_fighter.is_attack:
             this_fighter.is_jump = True
         if this_fighter.is_jump:
             this_fighter.animation.play_jump()
