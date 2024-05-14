@@ -87,11 +87,14 @@ class Battle_Screen(Screen):
 
     def check_keys(self):
         keys = pg.key.get_pressed()
-        self.move_fighters(keys,self.player1_fighter,self.player2_fighter,1,PLAYER1_CONTROLS)
-        self.jump_fighters(keys, self.player1_fighter, PLAYER1_CONTROLS)
+        self.check_all_fighter_inputs(keys,self.player1_fighter,self.player2_fighter,1,PLAYER1_CONTROLS)
+        self.check_all_fighter_inputs(keys,self.player2_fighter,self.player1_fighter,2,PLAYER2_CONTROLS)
 
-        self.move_fighters(keys,self.player2_fighter,self.player1_fighter,2,PLAYER2_CONTROLS)
-        self.jump_fighters(keys, self.player2_fighter, PLAYER2_CONTROLS)
+    def check_all_fighter_inputs(self,keys,this_fighter,other_fighter,fighter_num,player_controls):
+        self.move_fighters(keys,this_fighter,other_fighter,fighter_num,player_controls)
+        self.set_fighter_ground(this_fighter, other_fighter)
+        self.jump_fighters(keys, this_fighter, player_controls)
+        self.fall_fighters(this_fighter)
 
     def is_input(self, player_num, keys):
         if player_num == 1: controls = list(PLAYER1_CONTROLS.values())
@@ -112,20 +115,26 @@ class Battle_Screen(Screen):
             player_fighter.animation.play_move_backward()
     
     def jump_fighters(self,keys, this_fighter, player_controls):
-        if keys[player_controls["up"]] and not this_fighter.is_jump:
+        if keys[player_controls["up"]] and not this_fighter.is_jump and this_fighter.y == this_fighter.ground:
             this_fighter.is_jump = True
         if this_fighter.is_jump:
-            if this_fighter.jump_count >= 80:
+            this_fighter.animation.play_jump()
+            if this_fighter.jump_count < 40:
+                this_fighter.y -= this_fighter.jump_height
+                this_fighter.jump_count+=1
+            else:    
                 this_fighter.jump_count = 0
                 this_fighter.is_jump = False
-            elif this_fighter.jump_count < 40:
-                this_fighter.y -= this_fighter.jump_height
-                this_fighter.animation.play_jump()
-                this_fighter.jump_count+=1
-            elif this_fighter.jump_count >= 40:
-                this_fighter.y += this_fighter.jump_height
-                this_fighter.animation.play_jump()
-                this_fighter.jump_count+=1                   
+
+    def fall_fighters(self, this_fighter):
+        if not this_fighter.is_jump and this_fighter.y < this_fighter.ground:
+            this_fighter.y += this_fighter.jump_height
+    
+    def set_fighter_ground(self, this_fighter, other_fighter):
+        if this_fighter.y < other_fighter.y and (this_fighter.x + this_fighter.animation.width >= other_fighter.x and other_fighter.x + other_fighter.animation.width >= this_fighter.x):
+            this_fighter.ground = other_fighter.y - other_fighter.animation.height
+        else:
+            this_fighter.ground = GROUND_Y
 
     def move_fighters(self,keys, this_fighter, other_fighter, fighter_num, player_controls):
         tried_move = False 
@@ -170,7 +179,7 @@ class Battle_Screen(Screen):
         elif move_direction == "left" and this_fighter.x - this_fighter.movespeed > other_fighter.x + other_fighter.animation.width:
             return True
         
-        if this_fighter.y + 100 < other_fighter.y or this_fighter.y > other_fighter.y + 100:
+        if this_fighter.y + 100 <= other_fighter.y or this_fighter.y >= other_fighter.y + 100:
             return True
         
         return False
@@ -242,11 +251,11 @@ class Select_Screen(Screen):
     def set_player_fighter(self,fighter,player_fighter_var, direction):
         if player_fighter_var.name != fighter:
             if fighter == "doodles":
-                player_fighter_var = Doodles(direction)
+                player_fighter_var = Doodles(direction=direction,ground=GROUND_Y)
             elif fighter == "bowie":
-                player_fighter_var = Bowie(direction)
+                player_fighter_var = Bowie(direction=direction,ground=GROUND_Y)
             elif fighter == "ollie":
-                player_fighter_var = Ollie(direction)
+                player_fighter_var = Ollie(direction=direction,ground=GROUND_Y)
             
         return player_fighter_var
 
