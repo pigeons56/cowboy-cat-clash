@@ -17,9 +17,12 @@ class Fighter():
             self.jump_height = jump_height
             self.jump_count = 0
             self.is_jump = False
-            self.is_attack = False
-            self.attack_duration = 10
-            self.attack_count = 0
+            self.can_move_ground = True
+            self.can_move_air = True
+            self.can_jump = True
+            self.can_animate = True
+            self.can_attack = True
+            self.attack_state = None
             self.animation = Animation(width,height,self.path, self.direction)
 
 

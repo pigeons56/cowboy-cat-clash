@@ -24,14 +24,11 @@ class Animation():
     def load_idle_images(self):
         self.idle_images = self.load_images(f"{self.path}/idle",[])
 
-    def load_side_attack_images(self):
-        self.side_attack_images = self.load_images(f"{self.path}/side_attack",[])
+    def load_light_attack_images(self):
+        self.light_attack_images = self.load_images(f"{self.path}/light_attack",[])
     
-    def load_up_attack_images(self):
-        self.up_attack_images = self.load_images(f"{self.path}/up_attack",[])
-    
-    def load_down_attack_images(self):
-        self.down_attack_images = self.load_images(f"{self.path}/down_attack",[])
+    def load_heavy_attack_images(self):
+        self.heavy_attack_images = self.load_images(f"{self.path}/heavy_attack",[])
 
     def load_block_images(self):
         self.block_images = self.load_images(f"{self.path}/block",[])
@@ -51,9 +48,8 @@ class Animation():
     def load_all_images(self):
         self.load_jump_images()
         self.load_idle_images()
-        self.load_side_attack_images()
-        self.load_up_attack_images()
-        self.load_down_attack_images()
+        self.load_light_attack_images()
+        self.load_heavy_attack_images()
         self.load_block_images()
         self.load_move_forward_images()
         self.load_move_backward_images()
@@ -64,7 +60,8 @@ class Animation():
         if self.direction != direction:
             self.jump_images = self.flip_images(self.jump_images)
             self.idle_images = self.flip_images(self.idle_images)
-            self.side_attack_images = self.flip_images(self.side_attack_images)
+            self.light_attack_images = self.flip_images(self.light_attack_images)
+            self.heavy_attack_images = self.flip_images(self.heavy_attack_images)
             self.move_forward_images = self.flip_images(self.move_forward_images)
             self.move_backward_images = self.flip_images(self.move_backward_images)
             self.direction = direction
@@ -110,9 +107,41 @@ class Animation():
     def play_jump(self):
         self.image = self.jump_images[0]
 
-    def play_side_attack(self):
-        self.image = self.side_attack_images[0]
-
-
-    def play_up_attack(self):
-        self.image = self.up_attack_images[0]       
+    def play_attack(self, attack_state):
+        if attack_state == "light_attack":
+            if self.count < 7:
+                self.image = self.light_attack_images[0]
+                self.count+=1
+            if self.count >= 7:
+                self.reset_count()
+                return None
+            else:
+                return attack_state
+        elif attack_state == "heavy_attack":
+            if self.count < 10:
+                self.image = self.heavy_attack_images[0]
+                self.count+=1
+            elif self.count >= 10 and self.count < 20:
+                self.image = self.heavy_attack_images[1]
+                self.count+=1
+            elif self.count >= 20 and self.count < 30:
+                self.image = self.heavy_attack_images[2]
+                self.count+=1
+            elif self.count >= 30:
+                self.image = self.heavy_attack_images[3]
+                self.count+=1
+            if self.count >= 40:
+                self.reset_count() 
+                return None
+            else:
+                return attack_state   
+        
+    def play_block(self):
+        if self.count < 9:
+            self.image = self.block_images[0]
+            self.count+=1
+        if self.count >= 9:
+            self.reset_count()
+            return False
+        else:
+            return True
