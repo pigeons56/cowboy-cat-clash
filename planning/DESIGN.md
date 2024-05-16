@@ -1,4 +1,6 @@
-# CAT FIGHTER
+# Cowboy Cat Clash 
+
+Yeehaw!
 
 ## Objective
 - Beat the other player in this local two-player fighting game!
@@ -16,13 +18,11 @@
 ## Controls
 Player 1 controls (Player 2 controls)
 - W (^): jump
-  - +Q (ENTER): up attack
 - A (<)/D (>): depends on orientation
   - Forward walk/backward walk
-  - Q+Forward: attack
-  - Q+Backward: block
-- S+Q (ENTER) down attack (midair only)
-- E ('): special
+- S (v): Block
+- Q (SHIFT): Heavy attack
+- E (ENTER): Light attack
 
 ## Assets
 Start Screen
@@ -55,12 +55,24 @@ Battle Screen
   - Jump
   - Victory
   - Defeat
-  - Forward attack
-  - Up attack
+  - Heavy attack
+  - Light attack
   - Block
+  - Stunned
   
 - Jump sounds
 - Hit sounds
+
+Fighters
+-Ollie: gray tabby in cowboy hat
+  -"Average" speed, dmg (the OG character/the beginner character in fighting games)
+  -Baseline for other fighters
+-Bowie: black blob cat
+  -Wildcard, varying speed and dmg, possibly randomized
+-Doodles: chunky calico
+  -Slow speed, high dmg, slow startup + recovery but fast stun recovery
+-Venturi's Cat: siamese with wheat
+  -Fast speed, low dmg, fast startup + recovery but easily stunned
 
 Victory Screen
 - Victory music
@@ -76,11 +88,12 @@ Controls Screen
 - From Battle Screen ESC --> to Pause Screen.
 
 Fighter Select Screen
-- ESC --> to Start Screen.
 - Players select fighters --> Fighter Showcase Screen
+- Left click selects Player 1, right click selects Player 2
 
 Fighter Showcase Screen
 - Cutscene plays --> to Battle Screen.
+- Could also be a part of Battle Screen overlayed on top
 
 Battle Screen
 - ESC --> to Pause Screen.
