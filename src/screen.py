@@ -26,10 +26,10 @@ SCREEN_SIZE = (800,400)
 class Screen():
     def __init__(self, background_path,
                  screen_size=SCREEN_SIZE):
-        self.background = pg.image.load(background_path)
-        self.screen = pg.display.set_mode(screen_size)
-        self.running = False
-        self.clock = pg.time.Clock()
+        self._background = pg.image.load(background_path)
+        self._screen = pg.display.set_mode(screen_size)
+        self._running = False
+        self._clock = pg.time.Clock()
 
     def check_quit(self, event):
         if event.type == pg.QUIT:
@@ -44,20 +44,20 @@ class Screen():
     def end_loop_functions(self):
         pass
 
-    def check_button_hover(self,array):
+    def check_button_hover(self,button):
         mouse_x,mouse_y = pg.mouse.get_pos()
-        for i in array:
-            if i.is_clicked(mouse_x,mouse_y):
-                i.clicked = True
-                i.image = pg.image.load(i.clicked_path)
-            else:
-                i.clicked = False
-                i.image = pg.image.load(i.path)
+        if button.is_clicked(mouse_x,mouse_y):
+            button.clicked = True
+            button.image = pg.image.load(button.clicked_path)
+        else:
+            button.clicked = False
+            button.image = pg.image.load(button.path)
+
 
     def loop(self):
-        self.running = True
-        while self.running:
-            self.screen.blit(self.background,(0,0))
+        self._running = True
+        while self._running:
+            self._screen.blit(self._background,(0,0))
             self.loop_functions()
 
             for event in pg.event.get():
@@ -65,7 +65,7 @@ class Screen():
                 self.check_events(event)
 
             pg.display.update()
-            self.clock.tick(60)
+            self._clock.tick(60)
         Music().stop()
         self.end_loop_functions()
 
@@ -73,31 +73,31 @@ class Battle_Screen(Screen):
     def __init__(self,player1,player2):
         super().__init__("../assets/backgrounds/battle_background.png")
         
-        self.player1_fighter = player1
-        self.player1_fighter.x = 0
-        self.player1_fighter.y = GROUND_Y
-        self.player1_fighter.ground = GROUND_Y
+        self.__player1_fighter = player1
+        self.__player1_fighter.x = 0
+        self.__player1_fighter.y = GROUND_Y
+        self.__player1_fighter.ground = GROUND_Y
         
-        self.player2_fighter = player2
-        self.player2_fighter.x = 700
-        self.player2_fighter.y = GROUND_Y
-        self.player1_fighter.ground = GROUND_Y
+        self.__player2_fighter = player2
+        self.__player2_fighter.x = 700
+        self.__player2_fighter.y = GROUND_Y
+        self.__player1_fighter.ground = GROUND_Y
 
-        self.music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
+        self.__music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
                            "western_adventures.mp3","western_cowboy_ride.mp3",
                            "western.mp3")
 
     def blit_fighters(self):
-        self.screen.blit(self.player1_fighter.animation.image,(self.player1_fighter.x,self.player1_fighter.y))
-        self.screen.blit(self.player2_fighter.animation.image,(self.player2_fighter.x,self.player2_fighter.y))
+        self._screen.blit(self.__player1_fighter.animation.image,(self.__player1_fighter.x,self.__player1_fighter.y))
+        self._screen.blit(self.__player2_fighter.animation.image,(self.__player2_fighter.x,self.__player2_fighter.y))
 
     def check_events(self, event):
         pass
 
     def check_keys(self):
         keys = pg.key.get_pressed()
-        self.check_all_fighter_inputs(keys,self.player1_fighter,self.player2_fighter,1,PLAYER1_CONTROLS)
-        self.check_all_fighter_inputs(keys,self.player2_fighter,self.player1_fighter,2,PLAYER2_CONTROLS)
+        self.check_all_fighter_inputs(keys,self.__player1_fighter,self.__player2_fighter,1,PLAYER1_CONTROLS)
+        self.check_all_fighter_inputs(keys,self.__player2_fighter,self.__player1_fighter,2,PLAYER2_CONTROLS)
 
     def check_all_fighter_inputs(self,keys,this_fighter,other_fighter,fighter_num,player_controls):
         self.move_fighters(keys,this_fighter,other_fighter,fighter_num,player_controls)
@@ -139,13 +139,13 @@ class Battle_Screen(Screen):
         
         return False
     
-    def play_fighter_move(self, player_fighter, move_direction):
-        img_direction = player_fighter.animation.direction
+    def play_fighter_move(self, this_fighter, move_direction):
+        img_direction = this_fighter.animation.direction
 
         if img_direction == move_direction:
-            player_fighter.animation.play_move_forward()
+            this_fighter.animation.play_move_forward()
         else:
-            player_fighter.animation.play_move_backward()
+            this_fighter.animation.play_move_backward()
     
     def jump_fighters(self,keys, this_fighter, player_controls):
         if keys[player_controls["up"]] and not this_fighter.is_jump and this_fighter.y == this_fighter.ground and this_fighter.can_jump:
@@ -219,29 +219,29 @@ class Battle_Screen(Screen):
         return False
 
     def check_fighter_x(self):
-        if self.player1_fighter.x > self.player2_fighter.x:
-            self.player1_fighter.animation.check_direction("left")
-            self.player2_fighter.animation.check_direction("right")
+        if self.__player1_fighter.x > self.__player2_fighter.x:
+            self.__player1_fighter.animation.check_direction("left")
+            self.__player2_fighter.animation.check_direction("right")
         else:
-            self.player1_fighter.animation.check_direction("right")
-            self.player2_fighter.animation.check_direction("left")
+            self.__player1_fighter.animation.check_direction("right")
+            self.__player2_fighter.animation.check_direction("left")
 
     def loop_functions(self):
         self.blit_fighters()     
         self.check_fighter_x()
         self.check_keys()
-        Music().load_and_continue_play(choice(self.music_list))
+        Music().load_and_continue_play(choice(self.__music_list))
     
 
 
 class Controls_Screen(Screen):
     def __init__(self):
-        self.controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
+        self.__controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
         super().__init__("../assets/backgrounds/main_background.png")
         Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
-        self.screen.blit(self.controls_title.image,(self.controls_title.left_x,self.controls_title.left_y))
+        self._screen.blit(self.__controls_title.image,(self.__controls_title.left_x,self.__controls_title.left_y))
 
     def end_loop_functions(self):
         Start_Screen().loop()
@@ -249,16 +249,16 @@ class Controls_Screen(Screen):
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                self.running = False
+                self._running = False
 
 class Credits_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-        self.credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
+        self.__credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
         Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
-        self.screen.blit(self.credits_title.image,(self.credits_title.left_x,self.credits_title.left_y))
+        self._screen.blit(self.__credits_title.image,(self.__credits_title.left_x,self.__credits_title.left_y))
 
     def end_loop_functions(self):
         Start_Screen().loop()
@@ -266,94 +266,95 @@ class Credits_Screen(Screen):
     def check_events(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                self.running = False
+                self._running = False
 
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-        self.ready_button = Button("ready_button",200,200,300,100,"../assets/buttons/ready_button_unclicked.png",
+        self.__ready_button = Button("ready_button",200,200,300,100,"../assets/buttons/ready_button_unclicked.png",
                               "../assets/buttons/ready_button_clicked.png")
-        self.player1_fighter=Fighter("placeholder")
-        self.player2_fighter=Fighter("placeholder")
+        self.__player1_fighter=Fighter("placeholder")
+        self.__player2_fighter=Fighter("placeholder")
         self.load_portraits()
 
         Music().load_and_play_infinite("rough_n_ready.mp3")
 
     def load_portraits(self):
-        self.portraits=[None] * NUM_OF_FIGHTERS
+        self.__portraits=[None] * NUM_OF_FIGHTERS
         x,y=100,100
         for i in range(NUM_OF_FIGHTERS):
-            self.portraits[i] = Button(FIGHTERS[i],x,50,y,50,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
+            self.__portraits[i] = Button(FIGHTERS[i],x,50,y,50,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
                                        f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_clicked.png")
             x+=50
 
     def blit_idles(self):
-        if self.player1_fighter.name != "placeholder":
-            self.player1_fighter.animation.play_idle()
-            self.screen.blit(self.player1_fighter.animation.image,(0,200))
-        if self.player2_fighter.name != "placeholder":
-            self.player2_fighter.animation.play_idle()
-            self.screen.blit(self.player2_fighter.animation.image,(600,200))
+        if self.__player1_fighter.name != "placeholder":
+            self.__player1_fighter.animation.play_idle()
+            self._screen.blit(self.__player1_fighter.animation.image,(0,200))
+        if self.__player2_fighter.name != "placeholder":
+            self.__player2_fighter.animation.play_idle()
+            self._screen.blit(self.__player2_fighter.animation.image,(600,200))
 
-    def set_player_fighter(self,fighter,player_fighter_var, direction):
-        if player_fighter_var.name != fighter:
+    def set_this_fighter(self,fighter,this_fighter_var, direction):
+        if this_fighter_var.name != fighter:
             if fighter == "doodles":
-                player_fighter_var = Doodles(direction=direction)
+                this_fighter_var = Doodles(direction=direction)
             elif fighter == "bowie":
-                player_fighter_var = Bowie(direction=direction)
+                this_fighter_var = Bowie(direction=direction)
             elif fighter == "ollie":
-                player_fighter_var = Ollie(direction=direction)
+                this_fighter_var = Ollie(direction=direction)
             
-        return player_fighter_var
+        return this_fighter_var
 
     def blit_portraits(self):
-        for i in self.portraits:
-            self.screen.blit(i.image,(i.left_x,i.left_y))
+        for i in self.__portraits:
+            self._screen.blit(i.image,(i.left_x,i.left_y))
 
     def blit_ready_button(self):
-        if self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
-            self.screen.blit(self.ready_button.image,(self.ready_button.left_x,self.ready_button.left_y))
+        if self.__player1_fighter.name != "placeholder" and self.__player2_fighter.name != "placeholder":
+            self._screen.blit(self.__ready_button.image,(self.__ready_button.left_x,self.__ready_button.left_y))
 
     def check_events(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            for i in self.portraits:
+            for i in self.__portraits:
                 if i.clicked:
                     if event.button == 1:
-                        self.player1_fighter = self.set_player_fighter(i.name,self.player1_fighter, "right")
+                        self.__player1_fighter = self.set_this_fighter(i.name,self.__player1_fighter, "right")
                     elif event.button == 3:
-                        self.player2_fighter = self.set_player_fighter(i.name,self.player2_fighter, "left")
-            if self.ready_button.is_clicked(event.pos[0],event.pos[1]) and self.player1_fighter.name != "placeholder" and self.player2_fighter.name != "placeholder":
-                self.running = False
+                        self.__player2_fighter = self.set_this_fighter(i.name,self.__player2_fighter, "left")
+            if self.__ready_button.is_clicked(event.pos[0],event.pos[1]) and self.__player1_fighter.name != "placeholder" and self.__player2_fighter.name != "placeholder":
+                self._running = False
     
     def end_loop_functions(self):
-        Battle_Screen(self.player1_fighter,self.player2_fighter).loop()
+        Battle_Screen(self.__player1_fighter,self.__player2_fighter).loop()
 
 
     def loop_functions(self):
         self.blit_portraits()
-        self.check_button_hover(self.portraits)
-        self.check_button_hover([self.ready_button])
+        for portrait in self.__portraits:
+            self.check_button_hover(portrait)
+        self.check_button_hover(self.__ready_button)
         self.blit_idles()
         self.blit_ready_button()
 
 class Start_Screen(Screen):
     def __init__(self):
-        self.start_button = Button("start_button",310, 170, 200, 60, 
+        self.__start_button = Button("start_button",310, 170, 200, 60, 
                               "../assets/buttons/start_button_unclicked.png",
                               "../assets/buttons/start_button_clicked.png")
-        self.controls_button = Button("controls_button",265, 270, 265, 60, 
+        self.__controls_button = Button("controls_button",265, 270, 265, 60, 
                               "../assets/buttons/controls_button_unclicked.png",
                               "../assets/buttons/controls_button_clicked.png")
-        self.credits_button = Button("credits_button",290, 225, 330, 60, 
+        self.__credits_button = Button("credits_button",290, 225, 330, 60, 
                               "../assets/buttons/credits_button_unclicked.png",
                               "../assets/buttons/credits_button_clicked.png")
         
-        self.buttons = (self.start_button,self.controls_button,self.credits_button)
+        self.__buttons = (self.__start_button,self.__controls_button,self.__credits_button)
         
-        self.start_title = Sprite(200, 400, 5, 180, "../assets/text/start_title.png")
-        self.start_button_extra = Sprite(482,35,213,35,"../assets/extra/start_button_extra.png")
-        self.controls_button_extra = Sprite(222,70,234,80,"../assets/extra/controls_button_extra.png")
-        self.credits_button_extra = Sprite(510,40,350,35,"../assets/extra/credits_button_extra.png")
+        self.__start_title = Sprite(200, 400, 5, 180, "../assets/text/start_title.png")
+        self.__start_button_extra = Sprite(482,35,213,35,"../assets/extra/start_button_extra.png")
+        self.__controls_button_extra = Sprite(222,70,234,80,"../assets/extra/controls_button_extra.png")
+        self.__credits_button_extra = Sprite(510,40,350,35,"../assets/extra/credits_button_extra.png")
         
         Music().load_and_play_infinite("mexican_cowboys.mp3")
 
@@ -361,28 +362,29 @@ class Start_Screen(Screen):
     
     def check_events(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            for i in self.buttons:
+            for i in self.__buttons:
                 if i.clicked:
-                    self.running = False
+                    self._running = False
     
     def end_loop_functions(self):
-        if self.start_button.clicked:
+        if self.__start_button.clicked:
             Select_Screen().loop()
-        elif self.credits_button.clicked:
+        elif self.__credits_button.clicked:
             Credits_Screen().loop()
-        elif self.controls_button.clicked:
+        elif self.__controls_button.clicked:
             Controls_Screen().loop()
 
     def loop_functions(self):
-        self.screen.blit(self.start_title.image,(self.start_title.left_x,self.start_title.left_y))
+        self._screen.blit(self.__start_title.image,(self.__start_title.left_x,self.__start_title.left_y))
         
-        self.screen.blit(self.start_button.image,(self.start_button.left_x, self.start_button.left_y))
-        self.screen.blit(self.start_button_extra.image,(self.start_button_extra.left_x, self.start_button_extra.left_y))
+        self._screen.blit(self.__start_button.image,(self.__start_button.left_x, self.__start_button.left_y))
+        self._screen.blit(self.__start_button_extra.image,(self.__start_button_extra.left_x, self.__start_button_extra.left_y))
         
-        self.screen.blit(self.controls_button.image,(self.controls_button.left_x, self.controls_button.left_y))
-        self.screen.blit(self.controls_button_extra.image,(self.controls_button_extra.left_x, self.controls_button_extra.left_y))
+        self._screen.blit(self.__controls_button.image,(self.__controls_button.left_x, self.__controls_button.left_y))
+        self._screen.blit(self.__controls_button_extra.image,(self.__controls_button_extra.left_x, self.__controls_button_extra.left_y))
         
-        self.screen.blit(self.credits_button.image,(self.credits_button.left_x, self.credits_button.left_y))
-        self.screen.blit(self.credits_button_extra.image,(self.credits_button_extra.left_x, self.credits_button_extra.left_y))        
+        self._screen.blit(self.__credits_button.image,(self.__credits_button.left_x, self.__credits_button.left_y))
+        self._screen.blit(self.__credits_button_extra.image,(self.__credits_button_extra.left_x, self.__credits_button_extra.left_y))        
         
-        self.check_button_hover(self.buttons)
+        for button in self.__buttons:
+            self.check_button_hover(button)
