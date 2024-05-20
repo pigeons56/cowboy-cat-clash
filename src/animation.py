@@ -139,8 +139,7 @@ class Bowie_Animation(Animation):
             if self._count >= 7:
                 self.reset_count()
                 return None
-            else:
-                return attack_state
+
         elif attack_state == "heavy_attack":
             if self._count < 10:
                 self._image = self._heavy_attack_images[0]
@@ -154,18 +153,12 @@ class Bowie_Animation(Animation):
             elif self._count >= 30:
                 self._image = self._heavy_attack_images[3]
                 self._count+=1
-            if self._count >= 40:
+            if self._count >= 39:
                 self.reset_count() 
                 return None
-            else:
-                return attack_state   
+                        
+        return attack_state   
+            
         
     def play_block(self):
-        if self._count < 9:
-            self._image = self._block_images[0]
-            self._count+=1
-        if self._count >= 9:
-            self.reset_count()
-            return False
-        else:
-            return True
+        pass

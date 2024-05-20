@@ -107,27 +107,28 @@ class Battle_Screen(Screen):
         self.attack_fighters(keys,this_fighter,player_controls)
 
     def attack_fighters(self,keys,this_fighter,player_controls):
-        if this_fighter.attack_state == None and this_fighter.can_attack:
+        if this_fighter.can_attack:
             if keys[player_controls["light_attack"]]:
                 this_fighter.attack_state="light_attack"
             elif keys[player_controls["heavy_attack"]]:
                 this_fighter.attack_state="heavy_attack"
-            else:
-                this_fighter.can_jump = True
-                this_fighter.can_move_ground = True
-                this_fighter.can_move_sky = True
-                this_fighter.can_animate = True
                 
-            if this_fighter.attack_state != None:           
+            if this_fighter.attack_state != None:   
                 this_fighter.can_jump = True
                 this_fighter.can_move_ground = False
                 this_fighter.can_move_sky = True
                 this_fighter.can_animate = False
+                this_fighter.can_attack=False
                 this_fighter.animation.reset_count()
         else:
-            this_fighter.attack_state = this_fighter.animation.play_attack(this_fighter.attack_state) 
+            this_fighter.attack_state = this_fighter.animation.play_attack(this_fighter.attack_state)
 
-
+            if this_fighter.attack_state == None:
+                this_fighter.can_attack = True 
+                this_fighter.can_jump = True
+                this_fighter.can_move_ground = True
+                this_fighter.can_move_sky = True
+                this_fighter.can_animate = True
 
     def is_input(self, player_num, keys):
         if player_num == 1: controls = list(PLAYER1_CONTROLS.values())
