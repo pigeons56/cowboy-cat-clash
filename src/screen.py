@@ -283,10 +283,11 @@ class Select_Screen(Screen):
     def load_portraits(self):
         self.__portraits=[None] * NUM_OF_FIGHTERS
         x,y=100,100
+        portrait_size=75
         for i in range(NUM_OF_FIGHTERS):
-            self.__portraits[i] = Button(FIGHTERS[i],x,50,y,50,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
+            self.__portraits[i] = Button(FIGHTERS[i],x,portrait_size,y,portrait_size,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
                                        f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_clicked.png")
-            x+=50
+            x+=portrait_size
 
     def blit_idles(self):
         if self.__player1_fighter.name != "placeholder":

@@ -1,6 +1,6 @@
 import pygame as pg
 from animation import *
-FIGHTERS = ("doodles","bowie","ollie")
+FIGHTERS = ("doodles","bowie","venturi")
 NUM_OF_FIGHTERS = 3
 
 class Fighter():
@@ -137,7 +137,7 @@ class Doodles(Fighter):
         super().__init__(path="../assets/doodles",movespeed=6, direction = direction,jump_height=5,width=width,height=height)
 
 class Bowie(Fighter):
-    def __init__(self, direction,width=80,height=50):
+    def __init__(self, direction,width=60,height=50):
         super().__init__(path="../assets/bowie",movespeed=4, direction = direction,jump_height = 5,
                          width=width,height=height)
         self._animation = Bowie_Animation(width,height,self._path, direction)
