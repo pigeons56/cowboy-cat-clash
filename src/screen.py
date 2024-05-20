@@ -276,13 +276,16 @@ class Select_Screen(Screen):
                               "../assets/buttons/ready_button_clicked.png")
         self.__player1_fighter=Fighter("placeholder")
         self.__player2_fighter=Fighter("placeholder")
+        self.__player1_picked = Sprite(0,75,0,75,"../assets/extra/player1_picked.png")
+        self.__player2_picked = Sprite(0,75,0,75,"../assets/extra/player2_picked.png")
+
         self.load_portraits()
 
         Music().load_and_play_infinite("rough_n_ready.mp3")
 
     def load_portraits(self):
         self.__portraits=[None] * NUM_OF_FIGHTERS
-        x,y=100,100
+        x,y=275,100
         portrait_size=75
         for i in range(NUM_OF_FIGHTERS):
             self.__portraits[i] = Button(FIGHTERS[i],x,portrait_size,y,portrait_size,f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
@@ -292,10 +295,14 @@ class Select_Screen(Screen):
     def blit_idles(self):
         if self.__player1_fighter.name != "placeholder":
             self.__player1_fighter.animation.play_idle()
-            self._screen.blit(self.__player1_fighter.animation.image,(0,200))
+            self._screen.blit(self.__player1_fighter.animation.image,(50,180))
+            self._screen.blit(self.__player1_picked.image,(self.__player1_picked.left_x,self.__player1_picked.left_y))
+
         if self.__player2_fighter.name != "placeholder":
             self.__player2_fighter.animation.play_idle()
-            self._screen.blit(self.__player2_fighter.animation.image,(600,200))
+            self._screen.blit(self.__player2_fighter.animation.image,(650,180))
+            self._screen.blit(self.__player2_picked.image,(self.__player2_picked.left_x,self.__player2_picked.left_y))
+
 
     def set_this_fighter(self,fighter,this_fighter_var, direction):
         if this_fighter_var.name != fighter:
@@ -322,8 +329,12 @@ class Select_Screen(Screen):
                 if i.clicked:
                     if event.button == 1:
                         self.__player1_fighter = self.set_this_fighter(i.name,self.__player1_fighter, "right")
+                        self.__player1_picked.left_x = i.left_x-10
+                        self.__player1_picked.left_y = i.left_y - 10
                     elif event.button == 3:
                         self.__player2_fighter = self.set_this_fighter(i.name,self.__player2_fighter, "left")
+                        self.__player2_picked.left_x = i.left_x+10
+                        self.__player2_picked.left_y = i.left_y + 20
             if self.__ready_button.is_clicked(event.pos[0],event.pos[1]) and self.__player1_fighter.name != "placeholder" and self.__player2_fighter.name != "placeholder":
                 self._running = False
     

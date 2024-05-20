@@ -22,10 +22,18 @@ class Sprite():
     @property
     def left_x(self):
         return self._left_x
+    
+    @left_x.setter
+    def left_x(self,left_x):
+        self._left_x = left_x
 
     @property
     def left_y(self):
         return self._left_y
+    
+    @left_y.setter
+    def left_y(self, left_y):
+        self._left_y = left_y
     
     @property
     def image(self):
