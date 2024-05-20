@@ -101,6 +101,12 @@ class Animation():
             self._count+=1
         if self._count >= 40:
             self.reset_count()
+        
+
+class Bowie_Animation(Animation):
+    def __init__(self, width, height,
+                 path,direction):
+        super().__init__(width,height,path,direction)
 
     def play_move_forward(self):
         if self._count < 20:
@@ -163,5 +169,3 @@ class Animation():
             return False
         else:
             return True
-        
-#def Bowie_Animation(Animation):

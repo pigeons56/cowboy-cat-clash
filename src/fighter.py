@@ -23,6 +23,7 @@ class Fighter():
             self._can_attack = True
             self._attack_state = None
             self._animation = Animation(width,height,self._path, direction)
+
     @property
     def movespeed(self):
         return self._movespeed
@@ -132,14 +133,16 @@ class Fighter():
         self._jump_height = jump_height
 
 class Doodles(Fighter):
-    def __init__(self, direction):
-        super().__init__(path="../assets/doodles",movespeed=6, direction = direction,jump_height=5)
+    def __init__(self, direction,width=100,height=100):
+        super().__init__(path="../assets/doodles",movespeed=6, direction = direction,jump_height=5,width=width,height=height)
 
 class Bowie(Fighter):
-    def __init__(self, direction):
+    def __init__(self, direction,width=80,height=50):
         super().__init__(path="../assets/bowie",movespeed=4, direction = direction,jump_height = 5,
-                         width=60,height=50)
+                         width=width,height=height)
+        self._animation = Bowie_Animation(width,height,self._path, direction)
 
-class Ollie(Fighter):
-    def __init__(self, direction):
-        super().__init__(path="../assets/ollie",movespeed=9, direction = direction, jump_height = 5)
+class Venturi(Fighter):
+    def __init__(self, direction,width=100,height=100):
+        super().__init__(path="../assets/venturi",movespeed=9, direction = direction, jump_height = 5,
+                         width=width,height=height)

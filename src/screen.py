@@ -301,8 +301,8 @@ class Select_Screen(Screen):
                 this_fighter_var = Doodles(direction=direction)
             elif fighter == "bowie":
                 this_fighter_var = Bowie(direction=direction)
-            elif fighter == "ollie":
-                this_fighter_var = Ollie(direction=direction)
+            elif fighter == "venturi":
+                this_fighter_var = Venturi(direction=direction)
             
         return this_fighter_var
 
