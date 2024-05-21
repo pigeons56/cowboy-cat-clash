@@ -5,43 +5,21 @@ class Hurtbox():
         self._left_y = left_y
         self._right_y = right_y
     
-    @property
-    def left_x(self):
-        return self._left_x
-    
-    @left_x.setter
-    def left_x(self, left_x):
-        self._left_x = left_x
+    def update_size(self, left_x,left_y,right_x,right_y):
+        if self._left_x != left_x:
+            self._left_x = left_x +30
+        
+        if self._left_y != left_y:
+            self._left_y = left_y +30
 
-    @property
-    def right_x(self):
-        return self._right_x
+        if self._right_x != right_x:
+            self._right_x = right_x -25
+        
+        if self._right_y != right_y:
+            self._right_y = right_y -25
     
-    @right_x.setter
-    def right_x(self, right_x):
-        self._right_x = right_x
-
-    @property
-    def left_y(self):
-        return self._left_y
-    
-    @left_y.setter
-    def left_y(self, left_y):
-        self._left_y = left_y
-
-    @property
-    def right_y(self):
-        return self._right_y
-    
-    @right_y.setter
-    def right_y(self, right_y):
-        self._right_y = right_y
-    
-    def update_size(self, left_x,right_x,left_y,right_y):
-        self.left_x(left_x)
-        self.left_y(left_y)
-        self.right_x(right_x)
-        self.right_y(right_y)
+    def get_size(self):
+        return (self._left_x,self._left_y,self._right_x,self._right_y)
 
 class Hitbox(Hurtbox):
     def __init__(self, left_x, right_x, left_y, right_y):

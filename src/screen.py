@@ -113,6 +113,7 @@ class Battle_Screen(Screen):
         self.check_fighter_x()
         self.check_keys()
         Music().load_and_continue_play(choice(self.__music_list))
+        pg.draw.rect(self._screen,(255,0,0),(self.__player1_fighter.animation.hurtbox.get_size()))
     
 
 

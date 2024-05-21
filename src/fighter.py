@@ -17,6 +17,8 @@ class Fighter():
             self._ground = ground_y
             self._x=x
             self._y=y
+            self._width = width
+            self._height = height
             self._path = path
             self._jump_height = jump_height
             self._jump_count = 0
@@ -27,26 +29,10 @@ class Fighter():
             self._can_animate = True
             self._can_attack = True
             self._attack_state = None
-            self._hurtbox = Hurtbox(x,width,y,height)
-            self._hitbox = Hitbox(0,0,0,0)
-            self._animation = Animation(width,height,self._path, direction)
             self._controls = controls
 
-    @property
-    def hurtbox(self):
-        return self._hurtbox
-    
-    @hurtbox.setter
-    def hurtbox(self, hurtbox):
-        self._hurtbox = hurtbox
-
-    @property
-    def hitbox(self):
-        return self._hitbox
-    
-    @hitbox.setter
-    def hitbox(self, hitbox):
-        self._hitbox = hitbox
+            self._animation = Animation(self._width,self._height,self._path, direction)
+            self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
 
     @property
     def movespeed(self):
@@ -186,6 +172,7 @@ class Fighter():
 
     def play_move_directional(self, move_direction):
         img_direction = self._animation.direction
+        self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
 
         if img_direction == move_direction:
             self._animation.play_move_forward()
@@ -199,6 +186,7 @@ class Fighter():
             if self._can_animate: 
                 self._animation.play_jump()
             if self._jump_count < 45:
+                self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
                 self._y -= self._jump_height
                 self._jump_count+=1
             else:    
@@ -207,6 +195,7 @@ class Fighter():
 
     def fall(self):
         if not self._is_jump and self._y < self._ground:
+            self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
             self._y += self._jump_height
 
     def is_input(self, keys):

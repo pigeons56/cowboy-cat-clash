@@ -1,5 +1,6 @@
 import pygame as pg
 import os
+from hurtbox import *
 
 class Animation():
     def __init__(self, width, height,
@@ -13,7 +14,18 @@ class Animation():
         self.check_direction(direction)
         self._image = self._idle_images[0]
         
+        self._hurtbox = Hurtbox(0,0,0,0)
+        self._hitbox = Hitbox(0,0,0,0)
+        
         self.reset_count()
+    
+    @property
+    def hurtbox(self):
+        return self._hurtbox
+
+    @property
+    def hitbox(self):
+        return self._hitbox
 
     @property
     def image(self):
