@@ -1,25 +1,24 @@
+import pygame as pg
+
 class Hurtbox():
     def __init__(self, left_x, right_x, left_y, right_y):
         self._left_x = left_x
         self._right_x = right_x
         self._left_y = left_y
         self._right_y = right_y
+        self._box = pg.Rect(self._left_x,self._left_y,self._right_x,self._right_y)
+    
+    @property
+    def box(self):
+        return self._box
     
     def set_size(self, left_x,left_y,right_x,right_y):
-        if self._left_x != left_x:
-            self._left_x = left_x +30
-        
-        if self._left_y != left_y:
-            self._left_y = left_y +30
-
-        if self._right_x != right_x:
-            self._right_x = right_x -25
-        
-        if self._right_y != right_y:
-            self._right_y = right_y -25
+        self._left_x = left_x
+        self._right_x = right_x
+        self._left_y = left_y
+        self._right_y = right_y
+        self._box.update(left_x+25,left_y+30,right_x-15,right_y-20)
     
-    def get_size(self):
-        return (self._left_x,self._left_y,self._right_x,self._right_y)
 
 class Hitbox(Hurtbox):
     def __init__(self, left_x, right_x, left_y, right_y):
@@ -37,24 +36,20 @@ class Hitbox(Hurtbox):
     def set_change_variables(self, change_left_x,change_right_x,change_left_y,change_right_y,
                              direction,direction_offset):
         if direction == "left":
-            change_left_x = -change_left_x - direction_offset
+            change_left_x = -change_left_x + direction_offset
 
         return (change_left_x,change_right_x,change_left_y,change_right_y)
 
     def activate(self, hurtbox, change_left_x,change_right_x,change_left_y,change_right_y):
+        self._box.update(hurtbox._left_x + change_left_x, hurtbox._left_y + change_left_y,
+                         hurtbox._right_x + change_right_x, hurtbox._right_y + change_right_y)
         if not self.__active:
-            self._left_x = hurtbox._left_x + change_left_x
-            self._left_y = hurtbox._left_y + change_left_y
-            self._right_x = hurtbox._right_x + change_right_x
-            self._right_y = hurtbox._right_y + change_right_y
-
             self.__active = True
     
     def deactivate(self, hurtbox):
         if self.__active:
-            self._left_x = hurtbox._left_x
-            self._left_y = hurtbox._left_y 
-            self._right_x = hurtbox._right_x
-            self._right_y = hurtbox._right_y         
-
+            self._box = hurtbox.box.copy()      
             self.__active = False
+
+    def is_hit(self, hurtbox):
+        return self._box.colliderect(hurtbox.box)

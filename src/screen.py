@@ -110,15 +110,31 @@ class Battle_Screen(Screen):
         else:
             if player1_can_flip: self.__player1_fighter.animation.check_direction("right")
             if player2_can_flip: self.__player2_fighter.animation.check_direction("left")
+    
+    def check_fighter_hit(self):
+        self.__player1_fighter.take_dmg(self.__player2_fighter)
+        self.__player2_fighter.take_dmg(self.__player1_fighter)
+    
+    def check_fighter_bounds(self):
+        self.__player1_fighter.check_bounds()
+        self.__player2_fighter.check_bounds()
 
     def loop_functions(self):
         self.blit_fighters()     
         self.check_fighter_x()
         self.check_keys()
+        self.check_fighter_hit()
+        self.check_fighter_bounds()
         Music().load_and_continue_play(choice(self.__music_list))
-        pg.draw.rect(self._screen,(255,0,0),(self.__player1_fighter.animation.hurtbox.get_size()))
+        
+        pg.draw.rect(self._screen,(255,0,0),(self.__player1_fighter.animation.hurtbox.box))
         if self.__player1_fighter.animation.hitbox.active:
-            pg.draw.rect(self._screen,(0,255,0),(self.__player1_fighter.animation.hitbox.get_size()))
+            pg.draw.rect(self._screen,(0,255,0),(self.__player1_fighter.animation.hitbox.box))
+
+        pg.draw.rect(self._screen,(255,0,0),(self.__player2_fighter.animation.hurtbox.box))
+        if self.__player2_fighter.animation.hitbox.active:
+            pg.draw.rect(self._screen,(0,255,0),(self.__player2_fighter.animation.hitbox.box))
+        
 
 
 
