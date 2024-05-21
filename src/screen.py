@@ -175,8 +175,9 @@ class Credits_Screen(Screen):
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-        self.__ready_button = Button("ready_button",200,200,300,100,"../assets/buttons/ready_button_unclicked.png",
-                              "../assets/buttons/ready_button_clicked.png")
+        self.__select_title = Sprite(0, 800, 0, 132, "../assets/text/select_title.png") 
+        self.__ready_button = Button("ready_button",310, 170, 300, 60,"../assets/buttons/start_button_unclicked.png",
+                              "../assets/buttons/start_button_clicked.png")
         self.__player1_fighter=Fighter("placeholder")
         self.__player2_fighter=Fighter("placeholder")
         self.__player1_picked = Sprite(0,75,0,75,"../assets/extra/player1_picked.png")
@@ -252,6 +253,7 @@ class Select_Screen(Screen):
         self.check_button_hover(self.__ready_button)
         self.blit_idles()
         self.blit_ready_button()
+        self._screen.blit(self.__select_title.image,(self.__select_title.left_x,self.__select_title.left_y))
 
 class Start_Screen(Screen):
     def __init__(self):
