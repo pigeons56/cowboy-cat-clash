@@ -4,6 +4,7 @@ from sprite import *
 from fighter import *
 from animation import *
 from music import *
+from hp_bar import *
 from random import choice
 
 PLAYER1_CONTROLS = {"up": pg.K_w,
@@ -80,6 +81,18 @@ class Battle_Screen(Screen):
         self.__music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
                            "western_adventures.mp3","western_cowboy_ride.mp3",
                            "western.mp3")
+        
+        self.load_hp_bars()
+    
+    def load_hp_bars(self):
+        self.__player1_hp_bar = Hp_Bar(1,self.__player1_fighter.hp)
+        self.__player2_hp_bar = Hp_Bar(2,self.__player2_fighter.hp)
+    
+    def blit_hp_bars(self):
+        self.__player1_hp_bar.update_bar(self.__player1_fighter.hp)
+        pg.draw.rect(self._screen,(219,7,0),self.__player1_hp_bar.bar)
+        self.__player2_hp_bar.update_bar(self.__player2_fighter.hp)
+        pg.draw.rect(self._screen,(219,7,0),self.__player2_hp_bar.bar)
 
     def blit_fighters(self):
         self._screen.blit(self.__player1_fighter.animation.image,(self.__player1_fighter.x,self.__player1_fighter.y))
@@ -120,7 +133,8 @@ class Battle_Screen(Screen):
         self.__player2_fighter.check_bounds()
 
     def loop_functions(self):
-        self.blit_fighters()     
+        self.blit_fighters()    
+        self.blit_hp_bars() 
         self.check_fighter_x()
         self.check_keys()
         self.check_fighter_hit()

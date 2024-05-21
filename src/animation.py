@@ -177,7 +177,7 @@ class Bowie_Animation(Animation):
                 self._image = self._heavy_attack_images[3]
                 self._hitbox.deactivate(self._hurtbox)
                 self._count+=1
-            if self._count >= 39:
+            if self._count >= 40:
                 self.reset_count() 
                 return None
                         
@@ -330,7 +330,7 @@ class Venturi_Animation(Animation):
                 self._count+=1
                 self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
 
-            if self._count >= 39:
+            if self._count >= 40:
                 self.reset_count() 
                 self._hitbox.deactivate(self._hurtbox)
                 return None
