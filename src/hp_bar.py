@@ -15,7 +15,10 @@ class Hp_Bar():
         return self.__bar
     
     def update_bar(self,hp):
-        self.__hp = hp
+        if hp <= 0:
+            self.__hp = 0
+        else:
+            self.__hp = hp
         
         if self.__player_num == 1:
             self.__bar = pg.Rect(self.__bar_margin_x,self.__bar_margin_y,self.__hp,self.__height)

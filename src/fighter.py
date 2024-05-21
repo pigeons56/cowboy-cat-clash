@@ -8,8 +8,9 @@ NUM_OF_FIGHTERS = 3
 SCREEN_SIZE = (800,400)
 
 class Fighter():
-    def __init__(self, path, controls=None, ground_y = 0, direction="right", movespeed=1,x=0,y=0, jump_height=0,width=100,height=100,light_dmg=10,heavy_dmg=10):
-        self.name = path
+    def __init__(self, name, path, controls=None, ground_y = 0, direction="right", movespeed=1,x=0,y=0, jump_height=0,width=100,height=100,light_dmg=10,heavy_dmg=10):
+        self.path = path
+        self.name = name
         
         if self.name != "placeholder":
             self._movespeed = movespeed
@@ -36,7 +37,6 @@ class Fighter():
             self._light_dmg = light_dmg
 
             self._animation = Animation(self._width,self._height,self._path, direction)
-            self.update_hurtbox()
     
     @property
     def hp(self):
@@ -169,17 +169,17 @@ class Fighter():
         if other_fighter.animation.hitbox.is_hit(self._animation.hurtbox) and other_fighter.animation.hitbox.active:
             if other_fighter.attack_state == "light_attack":
                 if self._can_take_dmg: self._hp -= other_fighter.light_dmg
-                self.knockback(self._animation.direction,3)
+                self.knockback(self._animation.direction,2)
             elif other_fighter.attack_state == "heavy_attack":
                 if self._can_take_dmg: self._hp -= other_fighter.heavy_dmg
-                self.knockback(self._animation.direction,5)
+                self.knockback(self._animation.direction,4)
             self._attack_state = None
             self._can_jump = False
             self._can_move_ground = False
             self._can_move_sky = False
             self._can_animate = False
             self._can_take_dmg = False
-            print(self._hp)
+            self.animation.reset_count()
         elif not self._can_take_dmg:
             self._can_jump = True
             self._can_move_ground = True
@@ -261,7 +261,7 @@ class Fighter():
 
     def move(self,keys, other_fighter):
             tried_move = False 
-            if not self.is_input(keys) and self._can_animate:
+            if not self.is_input(keys) and self._can_animate and self._can_take_dmg:
                 self._animation.play_idle()
             elif self.can_move_ground or (self.can_move_sky and self._y != self._ground):
                 if keys[self._controls["right"]]:
@@ -321,18 +321,18 @@ class Fighter():
 
 class Doodles(Fighter):
     def __init__(self, direction, controls, width=70,height=60):
-        super().__init__(path="../assets/doodles",controls=controls,movespeed=2, direction = direction,jump_height=2,
+        super().__init__(name="doodles",path="../assets/doodles",controls=controls,movespeed=2, direction = direction,jump_height=2,
                          width=width,height=height,ground_y=270,light_dmg=8,heavy_dmg=25)
         self._animation = Doodles_Animation(width,height,self._path, direction)
 
 class Bowie(Fighter):
     def __init__(self, direction, controls, width=60,height=57):
-        super().__init__(path="../assets/bowie",controls=controls,movespeed=4, direction = direction,jump_height = 3,
+        super().__init__(name="bowie",path="../assets/bowie",controls=controls,movespeed=4, direction = direction,jump_height = 3,
                          width=width,height=height, ground_y=285,light_dmg=5,heavy_dmg=20)
         self._animation = Bowie_Animation(width,height,self._path, direction)
 
 class Venturi(Fighter):
     def __init__(self, direction,controls,width=75,height=60):
-        super().__init__(path="../assets/venturi",controls=controls,movespeed=6, direction = direction, jump_height = 4,
+        super().__init__(name="venturi",path="../assets/venturi",controls=controls,movespeed=6, direction = direction, jump_height = 4,
                          width=width,height=height, ground_y=270,light_dmg=3,heavy_dmg=16)
         self._animation = Venturi_Animation(width,height,self._path, direction)
