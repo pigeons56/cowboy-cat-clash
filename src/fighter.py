@@ -32,7 +32,7 @@ class Fighter():
             self._controls = controls
 
             self._animation = Animation(self._width,self._height,self._path, direction)
-            self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
+            self.update_hurtbox()
 
     @property
     def movespeed(self):
@@ -145,6 +145,9 @@ class Fighter():
     @property
     def ground_y(self):
         return self._ground_y
+    
+    def update_hurtbox(self):
+        self._animation.hurtbox.set_size(self._x,self._y,self._width,self._height)
 
     def attack(self,keys):
         if self._can_attack:
@@ -172,7 +175,7 @@ class Fighter():
 
     def play_move_directional(self, move_direction):
         img_direction = self._animation.direction
-        self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
+        self.update_hurtbox()
 
         if img_direction == move_direction:
             self._animation.play_move_forward()
@@ -186,7 +189,7 @@ class Fighter():
             if self._can_animate: 
                 self._animation.play_jump()
             if self._jump_count < 45:
-                self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
+                self.update_hurtbox()
                 self._y -= self._jump_height
                 self._jump_count+=1
             else:    
@@ -195,7 +198,7 @@ class Fighter():
 
     def fall(self):
         if not self._is_jump and self._y < self._ground:
-            self._animation.hurtbox.update_size(self._x,self._y,self._width,self._height)
+            self.update_hurtbox()
             self._y += self._jump_height
 
     def is_input(self, keys):
@@ -254,10 +257,16 @@ class Fighter():
         elif move_direction == "left" and self._x - self._movespeed > other_fighter.x + other_fighter.animation.width:
             return True
         
-        if self._y + self._animation.height <= other_fighter.y or self._y >= other_fighter.y + other_fighter.animation.height:
+        if self._y + self._animation.height -10 <= other_fighter.y or self._y >= other_fighter.y + other_fighter.animation.height:
             return True           
         
         return False
+    
+    def check_can_flip(self):
+        if (self._can_move_ground and self._y == self._ground) or (self._can_move_sky and self._y != self._ground):
+            return True
+        else:
+            return False
 
 
 class Doodles(Fighter):

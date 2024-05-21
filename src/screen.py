@@ -101,12 +101,15 @@ class Battle_Screen(Screen):
         this_fighter.attack(keys)
         
     def check_fighter_x(self):
+        player1_can_flip = self.__player1_fighter.check_can_flip()
+        player2_can_flip = self.__player2_fighter.check_can_flip()
+
         if self.__player1_fighter.x > self.__player2_fighter.x:
-            self.__player1_fighter.animation.check_direction("left")
-            self.__player2_fighter.animation.check_direction("right")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("left")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("right")
         else:
-            self.__player1_fighter.animation.check_direction("right")
-            self.__player2_fighter.animation.check_direction("left")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("right")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("left")
 
     def loop_functions(self):
         self.blit_fighters()     
@@ -114,7 +117,9 @@ class Battle_Screen(Screen):
         self.check_keys()
         Music().load_and_continue_play(choice(self.__music_list))
         pg.draw.rect(self._screen,(255,0,0),(self.__player1_fighter.animation.hurtbox.get_size()))
-    
+        if self.__player1_fighter.animation.hitbox.active:
+            pg.draw.rect(self._screen,(0,255,0),(self.__player1_fighter.animation.hitbox.get_size()))
+
 
 
 class Controls_Screen(Screen):

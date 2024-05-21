@@ -144,14 +144,26 @@ class Bowie_Animation(Animation):
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
-            if self._count < 7:
+
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                20,30,10,-10,self._direction,25)
+            
+            if self._count < 15:
                 self._image = self._light_attack_images[0]
                 self._count+=1
-            if self._count >= 7:
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+                
+
+            if self._count >= 15:
                 self.reset_count()
+                self._hitbox.deactivate(self._hurtbox)
+                
                 return None
 
         elif attack_state == "heavy_attack":
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                20,30,-10,20,self._direction,25)
+            
             if self._count < 10:
                 self._image = self._heavy_attack_images[0]
                 self._count+=1
@@ -161,8 +173,10 @@ class Bowie_Animation(Animation):
             elif self._count >= 20 and self._count < 30:
                 self._image = self._heavy_attack_images[2]
                 self._count+=1
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
             elif self._count >= 30:
                 self._image = self._heavy_attack_images[3]
+                self._hitbox.deactivate(self._hurtbox)
                 self._count+=1
             if self._count >= 39:
                 self.reset_count() 
@@ -210,14 +224,25 @@ class Doodles_Animation(Animation):
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
-            if self._count < 7:
+
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                20,20,10,10,self._direction,25)
+            
+            if self._count < 15:
                 self._image = self._light_attack_images[0]
                 self._count+=1
-            if self._count >= 7:
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+
+            if self._count >= 15:
                 self.reset_count()
+                self._hitbox.deactivate(self._hurtbox)
+
                 return None
 
         elif attack_state == "heavy_attack":
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                -30,40,10,20,self._direction,50)
+
             if self._count < 10:
                 self._image = self._heavy_attack_images[0]
                 self._count+=1
@@ -230,9 +255,13 @@ class Doodles_Animation(Animation):
             elif self._count >= 40 and self._count < 50:
                 self._image = self._heavy_attack_images[3]
                 self._count+=1
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+
             elif self._count >= 50:
                 self._image = self._heavy_attack_images[4]
                 self._count+=1
+                self._hitbox.deactivate(self._hurtbox)
+
             if self._count >= 70:
                 self.reset_count() 
                 return None
@@ -273,14 +302,24 @@ class Venturi_Animation(Animation):
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
-            if self._count < 7:
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                20,2,20,0,self._direction,25)
+            
+            if self._count < 15:
                 self._image = self._light_attack_images[0]
                 self._count+=1
-            if self._count >= 7:
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+
+            if self._count >= 15:
                 self.reset_count()
+                self._hitbox.deactivate(self._hurtbox)
+
                 return None
 
         elif attack_state == "heavy_attack":
+            change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
+                20,20,-30,50,self._direction,25)
+            
             if self._count < 7:
                 self._image = self._heavy_attack_images[0]
                 self._count+=1
@@ -290,8 +329,11 @@ class Venturi_Animation(Animation):
             elif self._count >= 14 and self._count < 40:
                 self._image = self._heavy_attack_images[2]
                 self._count+=1
+                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+
             if self._count >= 40:
                 self.reset_count() 
+                self._hitbox.deactivate(self._hurtbox)
                 return None
                         
         return attack_state   
