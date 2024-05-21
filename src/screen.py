@@ -4,27 +4,26 @@ from sprite import *
 from fighter import *
 from animation import *
 from music import *
+from hp_bar import *
 from random import choice
 
 PLAYER1_CONTROLS = {"up": pg.K_w,
-                     "down": pg.K_s,
                      "left": pg.K_a,
                      "right": pg.K_d,
                      "heavy_attack": pg.K_q,
                      "light_attack": pg.K_e}
 PLAYER2_CONTROLS = {"up": pg.K_UP,
-                     "down": pg.K_DOWN,
                      "left": pg.K_LEFT,
                      "right": pg.K_RIGHT,
-                     "heavy_attack": pg.K_RSHIFT,
-                     "light_attack": pg.K_RETURN}
+                     "heavy_attack": pg.K_PERIOD,
+                     "light_attack": pg.K_SLASH}
 
 class Screen():
     def __init__(self, background_path,
                  screen_size=SCREEN_SIZE):
         self._background = pg.image.load(background_path)
         self._screen = pg.display.set_mode(screen_size)
-        self._running = False
+        self._running = True
         self._clock = pg.time.Clock()
 
     def check_quit(self, event):
@@ -51,7 +50,6 @@ class Screen():
 
 
     def loop(self):
-        self._running = True
         while self._running:
             self._screen.blit(self._background,(0,0))
             self.loop_functions()
@@ -65,6 +63,73 @@ class Screen():
         Music().stop()
         self.end_loop_functions()
 
+class Victory_Screen(Screen):
+    def __init__(self, victor,loser,victor_num,player1_hp_bar,player2_hp_bar):
+        super().__init__("../assets/backgrounds/battle_background.png")
+        self.__victor = victor
+        self.__loser = loser
+        self.__player1_hp_bar = player1_hp_bar
+        self.__player2_hp_bar = player2_hp_bar
+        self.__victor_num = victor_num
+
+        Music().load_and_play_infinite("rolling_hills.mp3")
+
+        self.load_win_title()
+
+    def load_win_title(self):
+        if self.__victor_num == 1:
+            self.__win_title = pg.image.load("../assets/text/player1_win_title.png")
+        else:
+            self.__win_title = pg.image.load("../assets/text/player2_win_title.png")
+
+    def blit_hp_bars(self):
+        pg.draw.rect(self._screen,(219,7,0),self.__player1_hp_bar.bar)
+        pg.draw.rect(self._screen,(219,7,0),self.__player2_hp_bar.bar)
+
+    def blit_fighters(self):
+        self._screen.blit(self.__victor.animation.image,(self.__victor.x,self.__victor.y))
+        self._screen.blit(self.__loser.animation.image,(self.__loser.x,self.__loser.y))
+
+    def check_events(self, event):
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                self.__next_screen = "start"
+                self._running = False
+            if event.key == pg.K_SPACE:
+                self.__next_screen = "battle"
+                self._running = False
+
+    def loop_functions(self):
+        self.blit_fighters()
+        self.blit_hp_bars()
+
+        self.__victor.animation.play_victory()
+        self.__loser.animation.play_defeat()
+        self._screen.blit(self.__win_title,(0,0))
+
+    def reset_fighter(self,fighter,direction,player_controls):
+        if fighter.name == "bowie":
+            player = Bowie(direction,player_controls)
+        elif fighter.name == "doodles":
+            player = Doodles(direction,player_controls)
+        elif fighter.name == "venturi":
+            player = Venturi(direction,player_controls)
+
+        return player
+
+    def end_loop_functions(self):
+        if self.__next_screen == "start":
+            Start_Screen().loop()
+        elif self.__next_screen == "battle":
+            if self.__victor_num == 1:
+                player1 = self.reset_fighter(self.__victor,"right",PLAYER1_CONTROLS)
+                player2 = self.reset_fighter(self.__loser,"left",PLAYER2_CONTROLS)
+            else:
+                player1 = self.reset_fighter(self.__loser,"right",PLAYER1_CONTROLS)
+                player2 = self.reset_fighter(self.__victor,"left",PLAYER2_CONTROLS)
+            Battle_Screen(player1,player2).loop()
+
+    
 class Battle_Screen(Screen):
     def __init__(self,player1,player2):
         super().__init__("../assets/backgrounds/battle_background.png")
@@ -72,14 +137,28 @@ class Battle_Screen(Screen):
         self.__player1_fighter = player1
         self.__player1_fighter.x = 0
         self.__player1_fighter.y = self.__player1_fighter.ground_y
+        self.__player1_fighter.update_hurtbox()
         
         self.__player2_fighter = player2
         self.__player2_fighter.x = 700
         self.__player2_fighter.y = self.__player2_fighter.ground_y
+        self.__player2_fighter.update_hurtbox()
 
         self.__music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
                            "western_adventures.mp3","western_cowboy_ride.mp3",
                            "western.mp3")
+        
+        self.load_hp_bars()
+    
+    def load_hp_bars(self):
+        self.__player1_hp_bar = Hp_Bar(1,self.__player1_fighter.hp)
+        self.__player2_hp_bar = Hp_Bar(2,self.__player2_fighter.hp)
+    
+    def blit_hp_bars(self):
+        self.__player1_hp_bar.update_bar(self.__player1_fighter.hp)
+        pg.draw.rect(self._screen,(219,7,0),self.__player1_hp_bar.bar)
+        self.__player2_hp_bar.update_bar(self.__player2_fighter.hp)
+        pg.draw.rect(self._screen,(219,7,0),self.__player2_hp_bar.bar)
 
     def blit_fighters(self):
         self._screen.blit(self.__player1_fighter.animation.image,(self.__player1_fighter.x,self.__player1_fighter.y))
@@ -101,19 +180,48 @@ class Battle_Screen(Screen):
         this_fighter.attack(keys)
         
     def check_fighter_x(self):
+        player1_can_flip = self.__player1_fighter.check_can_flip()
+        player2_can_flip = self.__player2_fighter.check_can_flip()
+
         if self.__player1_fighter.x > self.__player2_fighter.x:
-            self.__player1_fighter.animation.check_direction("left")
-            self.__player2_fighter.animation.check_direction("right")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("left")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("right")
         else:
-            self.__player1_fighter.animation.check_direction("right")
-            self.__player2_fighter.animation.check_direction("left")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("right")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("left")
+    
+    def check_fighter_hit(self):
+        self.__player1_fighter.take_dmg(self.__player2_fighter)
+        self.__player2_fighter.take_dmg(self.__player1_fighter)
+    
+    def check_fighter_bounds(self):
+        self.__player1_fighter.check_bounds()
+        self.__player2_fighter.check_bounds()
+
+    def check_defeat(self):
+        if self.__player1_fighter.hp <= 0:
+            self.__victor = self.__player2_fighter
+            self.__loser = self.__player1_fighter
+            self.__victor_num = 2
+            self._running = False
+        elif self.__player2_fighter.hp <= 0:
+            self.__victor = self.__player1_fighter
+            self.__loser = self.__player2_fighter
+            self.__victor_num = 1
+            self._running = False
 
     def loop_functions(self):
-        self.blit_fighters()     
+        self.check_defeat()
+        self.blit_fighters()    
+        self.blit_hp_bars() 
         self.check_fighter_x()
         self.check_keys()
+        self.check_fighter_hit()
+        self.check_fighter_bounds()
         Music().load_and_continue_play(choice(self.__music_list))
     
+    def end_loop_functions(self):
+        Victory_Screen(self.__victor,self.__loser,self.__victor_num,self.__player1_hp_bar,self.__player2_hp_bar).loop()
 
 
 class Controls_Screen(Screen):
@@ -153,10 +261,11 @@ class Credits_Screen(Screen):
 class Select_Screen(Screen):
     def __init__(self):
         super().__init__("../assets/backgrounds/main_background.png")
-        self.__ready_button = Button("ready_button",200,200,300,100,"../assets/buttons/ready_button_unclicked.png",
-                              "../assets/buttons/ready_button_clicked.png")
-        self.__player1_fighter=Fighter("placeholder")
-        self.__player2_fighter=Fighter("placeholder")
+        self.__select_title = Sprite(0, 800, 0, 132, "../assets/text/select_title.png") 
+        self.__ready_button = Button("ready_button",310, 170, 300, 60,"../assets/buttons/start_button_unclicked.png",
+                              "../assets/buttons/start_button_clicked.png")
+        self.__player1_fighter=Fighter("placeholder","placeholder")
+        self.__player2_fighter=Fighter("placeholder","placeholder")
         self.__player1_picked = Sprite(0,75,0,75,"../assets/extra/player1_picked.png")
         self.__player2_picked = Sprite(0,75,0,75,"../assets/extra/player2_picked.png")
 
@@ -230,6 +339,7 @@ class Select_Screen(Screen):
         self.check_button_hover(self.__ready_button)
         self.blit_idles()
         self.blit_ready_button()
+        self._screen.blit(self.__select_title.image,(self.__select_title.left_x,self.__select_title.left_y))
 
 class Start_Screen(Screen):
     def __init__(self):

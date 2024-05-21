@@ -1,15 +1,16 @@
 import pygame as pg
 from animation import *
 from hurtbox import *
+from fighter_exceptions import *
 
 FIGHTERS = ("doodles","bowie","venturi")
 NUM_OF_FIGHTERS = 3
 SCREEN_SIZE = (800,400)
 
-
 class Fighter():
-    def __init__(self, path, controls=None, ground_y = 0, direction="right", movespeed=1,x=0,y=0, jump_height=0,width=100,height=100):
-        self.name = path
+    def __init__(self, name, path, controls=None, ground_y = 0, direction="right", movespeed=1,x=0,y=0, jump_height=0,width=100,height=100,light_dmg=10,heavy_dmg=10):
+        self.path = path
+        self.name = name
         
         if self.name != "placeholder":
             self._movespeed = movespeed
@@ -17,6 +18,8 @@ class Fighter():
             self._ground = ground_y
             self._x=x
             self._y=y
+            self._width = width
+            self._height = height
             self._path = path
             self._jump_height = jump_height
             self._jump_count = 0
@@ -26,27 +29,26 @@ class Fighter():
             self._can_jump = True
             self._can_animate = True
             self._can_attack = True
+            self._can_take_dmg = True
             self._attack_state = None
-            self._hurtbox = Hurtbox(x,width,y,height)
-            self._hitbox = Hitbox(0,0,0,0)
-            self._animation = Animation(width,height,self._path, direction)
             self._controls = controls
+            self._hp = 250
+            self._heavy_dmg = heavy_dmg
+            self._light_dmg = light_dmg
+
+            self._animation = Animation(self._width,self._height,self._path, direction)
+    
+    @property
+    def hp(self):
+        return self._hp
 
     @property
-    def hurtbox(self):
-        return self._hurtbox
+    def light_dmg(self):
+        return self._light_dmg
     
-    @hurtbox.setter
-    def hurtbox(self, hurtbox):
-        self._hurtbox = hurtbox
-
     @property
-    def hitbox(self):
-        return self._hitbox
-    
-    @hitbox.setter
-    def hitbox(self, hitbox):
-        self._hitbox = hitbox
+    def heavy_dmg(self):
+        return self._heavy_dmg
 
     @property
     def movespeed(self):
@@ -159,6 +161,38 @@ class Fighter():
     @property
     def ground_y(self):
         return self._ground_y
+    
+    def update_hurtbox(self):
+        self._animation.hurtbox.set_size(self._x,self._y,self._width,self._height)
+
+    def take_dmg(self,other_fighter):
+        if other_fighter.animation.hitbox.is_hit(self._animation.hurtbox) and other_fighter.animation.hitbox.active:
+            if other_fighter.attack_state == "light_attack":
+                if self._can_take_dmg: self._hp -= other_fighter.light_dmg
+                self.knockback(self._animation.direction,2)
+            elif other_fighter.attack_state == "heavy_attack":
+                if self._can_take_dmg: self._hp -= other_fighter.heavy_dmg
+                self.knockback(self._animation.direction,4)
+            self._attack_state = None
+            self._can_jump = False
+            self._can_move_ground = False
+            self._can_move_sky = False
+            self._can_animate = False
+            self._can_take_dmg = False
+            self.animation.reset_count()
+        elif not self._can_take_dmg:
+            self._can_jump = True
+            self._can_move_ground = True
+            self._can_move_sky = True
+            self._can_animate = True
+            self._can_take_dmg = True
+
+    def knockback(self,direction,strength):
+        if direction == "right":
+            self._x -= strength
+        else:
+            self._x += strength 
+        self.update_hurtbox()
 
     def attack(self,keys):
         if self._can_attack:
@@ -186,6 +220,7 @@ class Fighter():
 
     def play_move_directional(self, move_direction):
         img_direction = self._animation.direction
+        self.update_hurtbox()
 
         if img_direction == move_direction:
             self._animation.play_move_forward()
@@ -199,6 +234,7 @@ class Fighter():
             if self._can_animate: 
                 self._animation.play_jump()
             if self._jump_count < 45:
+                self.update_hurtbox()
                 self._y -= self._jump_height
                 self._jump_count+=1
             else:    
@@ -207,6 +243,7 @@ class Fighter():
 
     def fall(self):
         if not self._is_jump and self._y < self._ground:
+            self.update_hurtbox()
             self._y += self._jump_height
 
     def is_input(self, keys):
@@ -224,68 +261,78 @@ class Fighter():
 
     def move(self,keys, other_fighter):
             tried_move = False 
-            if not self.is_input(keys) and self._can_animate:
+            if not self.is_input(keys) and self._can_animate and self._can_take_dmg:
                 self._animation.play_idle()
-            elif self._can_move_ground or (self._can_move_sky and self._y != self._ground):
+            elif self.can_move_ground or (self.can_move_sky and self._y != self._ground):
                 if keys[self._controls["right"]]:
                     move_direction = "right"
                     tried_move = True
-                    if self.check_can_move(other_fighter,move_direction):
+                    if self.check_fighter_collision(other_fighter,move_direction,self._movespeed):
                         self._x+=self._movespeed
                 
                 elif keys[self._controls["left"]]:
                     move_direction = "left"
                     tried_move = True
-                    if self.check_can_move(other_fighter,move_direction):
+                    if self.check_fighter_collision(other_fighter,move_direction,self._movespeed):
                         self._x-=self._movespeed
                 
                 if tried_move and self._can_animate:
                     self.play_move_directional(move_direction)
-    
-    def check_can_move(self, other_fighter, move_direction):
-        return self.check_screen_bounds(move_direction) and self.check_fighter_collision(other_fighter, move_direction)
-    
-    def check_screen_bounds(self, move_direction):
-
-        if move_direction == "right" and self._x + self._movespeed + self._animation.width > SCREEN_SIZE[0]:
-            return False
-        elif move_direction == "left" and self._x - self._movespeed < 0:
-            return False
-        
-        return True
-    
-    def check_fighter_collision(self, other_fighter, move_direction):
+     
+    def check_fighter_collision(self, other_fighter, move_direction,dist_change):
         img_direction = self._animation.direction
 
         if move_direction != img_direction:
             return True
         
-        if move_direction == "right" and self._x + self._movespeed + self._animation.width < other_fighter.x:
+        if move_direction == "right" and self._x + dist_change + self._animation.width <= other_fighter.x:
             return True
-        elif move_direction == "left" and self._x - self._movespeed > other_fighter.x + other_fighter.animation.width:
+        elif move_direction == "left" and self._x - dist_change >= other_fighter.x + other_fighter.animation.width:
             return True
         
-        if self._y + self._animation.height <= other_fighter.y or self._y >= other_fighter.y + other_fighter.animation.height:
+        if self._y + self._animation.height -10 <= other_fighter.y or self._y >= other_fighter.y + other_fighter.animation.height:
             return True           
         
         return False
+    
+    def check_bounds(self):
+        try:
+            if self.can_move():
+                if self._x < 0:
+                    raise Out_Of_Left_Bound
+                elif self._x + self._width > SCREEN_SIZE[0]:
+                    raise Out_Of_Right_Bound
+        except Out_Of_Right_Bound:
+            self._x = 0
+            self.update_hurtbox()
+        except Out_Of_Left_Bound:
+            self._x = SCREEN_SIZE[0] - self._width
+            self.update_hurtbox()
+
+    def check_can_flip(self):
+        if self.can_move():
+            return True
+        else:
+            return False
+        
+    def can_move(self):
+        return (self._can_move_ground and self._y == self._ground) or (self._can_move_sky and self._y != self._ground)
 
 
 class Doodles(Fighter):
     def __init__(self, direction, controls, width=70,height=60):
-        super().__init__(path="../assets/doodles",controls=controls,movespeed=2, direction = direction,jump_height=2,
-                         width=width,height=height,ground_y=270)
+        super().__init__(name="doodles",path="../assets/doodles",controls=controls,movespeed=2, direction = direction,jump_height=2,
+                         width=width,height=height,ground_y=270,light_dmg=8,heavy_dmg=25)
         self._animation = Doodles_Animation(width,height,self._path, direction)
-
 
 class Bowie(Fighter):
     def __init__(self, direction, controls, width=60,height=57):
-        super().__init__(path="../assets/bowie",controls=controls,movespeed=4, direction = direction,jump_height = 3,
-                         width=width,height=height, ground_y=285)
+        super().__init__(name="bowie",path="../assets/bowie",controls=controls,movespeed=4, direction = direction,jump_height = 3,
+                         width=width,height=height, ground_y=285,light_dmg=5,heavy_dmg=20)
         self._animation = Bowie_Animation(width,height,self._path, direction)
 
 class Venturi(Fighter):
     def __init__(self, direction,controls,width=75,height=60):
-        super().__init__(path="../assets/venturi",controls=controls,movespeed=6, direction = direction, jump_height = 4,
-                         width=width,height=height, ground_y=270)
+        super().__init__(name="venturi",path="../assets/venturi",controls=controls,movespeed=6, direction = direction, jump_height = 4,
+                         width=width,height=height, ground_y=270,light_dmg=3,heavy_dmg=16)
         self._animation = Venturi_Animation(width,height,self._path, direction)
