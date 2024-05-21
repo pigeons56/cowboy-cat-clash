@@ -36,7 +36,14 @@ class Hurtbox():
     @right_y.setter
     def right_y(self, right_y):
         self._right_y = right_y
+    
+    def update_size(self, left_x,right_x,left_y,right_y):
+        self.left_x(left_x)
+        self.left_y(left_y)
+        self.right_x(right_x)
+        self.right_y(right_y)
 
 class Hitbox(Hurtbox):
     def __init__(self, left_x, right_x, left_y, right_y):
         super().__init__(left_x, right_x, left_y, right_y)
+        self.active = False

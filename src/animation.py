@@ -1,6 +1,6 @@
 import pygame as pg
 import os
-from hurtbox import *
+
 class Animation():
     def __init__(self, width, height,
                  path,direction):
@@ -13,9 +13,6 @@ class Animation():
         self.check_direction(direction)
         self._image = self._idle_images[0]
         
-        self._hurtbox = Hurtbox(0,0,0,0)
-        self._hitbox = Hitbox(0,0,0,0)
-
         self.reset_count()
 
     @property
@@ -94,6 +91,12 @@ class Animation():
     
     def reset_count(self):
         self._count = 0
+        
+
+class Bowie_Animation(Animation):
+    def __init__(self, width, height,
+                 path,direction):
+        super().__init__(width,height,path,direction)
 
     def play_idle(self):
         if self._count < 20:
@@ -104,12 +107,6 @@ class Animation():
             self._count+=1
         if self._count >= 40:
             self.reset_count()
-        
-
-class Bowie_Animation(Animation):
-    def __init__(self, width, height,
-                 path,direction):
-        super().__init__(width,height,path,direction)
 
     def play_move_forward(self):
         if self._count < 20:

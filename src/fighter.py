@@ -1,5 +1,7 @@
 import pygame as pg
 from animation import *
+from hurtbox import *
+
 FIGHTERS = ("doodles","bowie","venturi")
 NUM_OF_FIGHTERS = 3
 
@@ -22,7 +24,25 @@ class Fighter():
             self._can_animate = True
             self._can_attack = True
             self._attack_state = None
+            self._hurtbox = Hurtbox(x,width,y,height)
+            self._hitbox = Hitbox(0,0,0,0)
             self._animation = Animation(width,height,self._path, direction)
+    
+    @property
+    def hurtbox(self):
+        return self._hurtbox
+    
+    @hurtbox.setter
+    def hurtbox(self, hurtbox):
+        self._hurtbox = hurtbox
+
+    @property
+    def hitbox(self):
+        return self._hitbox
+    
+    @hitbox.setter
+    def hitbox(self, hitbox):
+        self._hitbox = hitbox
 
     @property
     def movespeed(self):
