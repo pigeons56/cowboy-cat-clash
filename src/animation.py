@@ -91,7 +91,9 @@ class Animation():
     
     def reset_count(self):
         self._count = 0
-        
+
+    def play_jump(self):
+        self._image = self._jump_images[0]
 
 class Bowie_Animation(Animation):
     def __init__(self, width, height,
@@ -128,9 +130,6 @@ class Bowie_Animation(Animation):
         if self._count >= 40:
             self.reset_count()
 
-    def play_jump(self):
-        self._image = self._jump_images[0]
-
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
             if self._count < 7:
@@ -158,7 +157,132 @@ class Bowie_Animation(Animation):
                 return None
                         
         return attack_state   
-            
+        
+    def play_block(self):
+        pass
+
+class Doodles_Animation(Animation):
+    def __init__(self, width, height,
+                 path,direction):
+        super().__init__(width,height,path,direction)
+
+    def play_idle(self):
+        if self._count < 20:
+            self._image = self._idle_images[0]
+            self._count+=1
+        elif self._count >= 20:
+            self._image = self._idle_images[1]
+            self._count+=1
+        if self._count >= 40:
+            self.reset_count()
+
+    def play_move_forward(self):
+        if self._count < 20:
+            self._image = self._move_forward_images[0]
+            self._count+=1
+        elif self._count >= 20:
+            self._image = self._move_forward_images[1]
+            self._count+=1
+        if self._count >= 40:
+            self.reset_count()
+
+    def play_move_backward(self):
+        if self._count < 20:
+            self._image = self._move_backward_images[0]
+            self._count+=1
+        elif self._count >= 20:
+            self._image = self._move_backward_images[1]
+            self._count+=1
+        if self._count >= 40:
+            self.reset_count()
+
+    def play_attack(self, attack_state):
+        if attack_state == "light_attack":
+            if self._count < 7:
+                self._image = self._light_attack_images[0]
+                self._count+=1
+            if self._count >= 7:
+                self.reset_count()
+                return None
+
+        elif attack_state == "heavy_attack":
+            if self._count < 10:
+                self._image = self._heavy_attack_images[0]
+                self._count+=1
+            elif self._count >= 10 and self._count < 20:
+                self._image = self._heavy_attack_images[1]
+                self._count+=1
+            elif self._count >= 20 and self._count < 40:
+                self._image = self._heavy_attack_images[2]
+                self._count+=1
+            elif self._count >= 40 and self._count < 50:
+                self._image = self._heavy_attack_images[3]
+                self._count+=1
+            elif self._count >= 50:
+                self._image = self._heavy_attack_images[4]
+                self._count+=1
+            if self._count >= 70:
+                self.reset_count() 
+                return None
+                        
+        return attack_state   
+        
+    def play_block(self):
+        pass    
+
+class Venturi_Animation(Animation):
+    def __init__(self, width, height,
+                 path,direction):
+        super().__init__(width,height,path,direction)
+
+    def play_idle(self):
+        if self._count < 20:
+            self._image = self._idle_images[0]
+            self._count+=1
+        elif self._count >= 20:
+            self._image = self._idle_images[1]
+            self._count+=1
+        if self._count >= 40:
+            self.reset_count()
+
+    def play_move_forward(self):
+        if self._count < 20:
+            self._image = self._move_forward_images[0]
+            self._count+=1
+        if self._count >= 20:
+            self.reset_count()
+
+    def play_move_backward(self):
+        if self._count < 20:
+            self._image = self._move_backward_images[0]
+            self._count+=1
+        if self._count >= 20:
+            self.reset_count()
+
+    def play_attack(self, attack_state):
+        if attack_state == "light_attack":
+            if self._count < 7:
+                self._image = self._light_attack_images[0]
+                self._count+=1
+            if self._count >= 7:
+                self.reset_count()
+                return None
+
+        elif attack_state == "heavy_attack":
+            if self._count < 7:
+                self._image = self._heavy_attack_images[0]
+                self._count+=1
+            elif self._count >= 7 and self._count < 14:
+                self._image = self._heavy_attack_images[1]
+                self._count+=1
+            elif self._count >= 14 and self._count < 40:
+                self._image = self._heavy_attack_images[2]
+                self._count+=1
+            if self._count >= 40:
+                self.reset_count() 
+                return None
+                        
+        return attack_state   
         
     def play_block(self):
         pass
