@@ -227,7 +227,7 @@ class Battle_Screen(Screen):
 class Controls_Screen(Screen):
     def __init__(self):
         self.__controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
-        super().__init__("../assets/backgrounds/main_background.png")
+        super().__init__("../assets/backgrounds/controls_background.png")
         Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
@@ -243,7 +243,7 @@ class Controls_Screen(Screen):
 
 class Credits_Screen(Screen):
     def __init__(self):
-        super().__init__("../assets/backgrounds/main_background.png")
+        super().__init__("../assets/backgrounds/credits_background.png")
         self.__credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
         Music().load_and_play_infinite("wild_west_background.mp3")
 
