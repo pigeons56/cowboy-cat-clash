@@ -279,7 +279,7 @@ class Doodles(Fighter):
 
 
 class Bowie(Fighter):
-    def __init__(self, direction, controls, width=60,height=50):
+    def __init__(self, direction, controls, width=60,height=57):
         super().__init__(path="../assets/bowie",controls=controls,movespeed=4, direction = direction,jump_height = 3,
                          width=width,height=height, ground_y=285)
         self._animation = Bowie_Animation(width,height,self._path, direction)
