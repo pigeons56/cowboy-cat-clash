@@ -1,5 +1,4 @@
 from pygame import mixer
-import os
 
 class Music():
     @staticmethod
