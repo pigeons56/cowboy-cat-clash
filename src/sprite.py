@@ -1,9 +1,17 @@
 import pygame as pg
 
 class Sprite():
-    def __init__(self, left_x, width,
-                 left_y, height, 
-                 path):
+    def __init__(self, left_x, width, left_y, height, path):
+        """
+        Initialize a Sprite object.
+
+        Parameters:
+            left_x (int): Sprite's left x-value in px
+            width (int): Sprite's width in px
+            left_y (int): Sprite's left y-value in px
+            height (int): Sprite's height in px
+            path (str): Location of Sprite image
+        """
         self._path = path
         self._left_x = left_x
         self._right_x = self.left_x+width
@@ -44,9 +52,18 @@ class Sprite():
         self._image = image
     
 class Button(Sprite):
-    def __init__(self, name, left_x, width,
-                 left_y, height, 
-                 path, clicked_path):
+    def __init__(self, name, left_x, width, left_y, height, path, clicked_path):
+        """
+        Initialize a Button object.
+
+        Parameters:
+            left_x (int): Sprite's left x-value in px
+            width (int): Sprite's width in px
+            left_y (int): Sprite's left y-value in px
+            height (int): Sprite's height in px
+            path (str): Location of Sprite unclicked image
+            clicked_path (str): Location of Sprite clicked image
+        """
         super().__init__(left_x,width,left_y,height,path)
         self.__clicked_path = clicked_path
         self.__clicked=False
@@ -73,6 +90,16 @@ class Button(Sprite):
         return self.__name
 
     def is_clicked(self, pointer_x, pointer_y):
+        """
+        Check if button has been clicked.
+
+        Parameters:
+            pointer_x (int): x-value of mouse pointer.
+            pointer_y (int): y-value of mouse pointer.
+        
+        Returns:
+            bool: True if clicked, False if not.
+        """
         if (self._left_x <= pointer_x and pointer_x <= self._right_x
             and self._left_y <= pointer_y and pointer_y <= self._right_y):
             return True
