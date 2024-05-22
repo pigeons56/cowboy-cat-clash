@@ -7,7 +7,7 @@ if __name__ == "__main__":
 
     #Title & icon
     pg.display.set_caption("Cowboy Cat Clash")
-    pg.display.set_icon(pg.image.load("../assets/extra/icon.png"))
+    pg.display.set_icon(pg.image.load("./assets/extra/icon.png"))
 
     #Initialize musicplayer
     mixer.init()

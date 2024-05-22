@@ -3,7 +3,7 @@ import os
 
 class Music():
     @staticmethod
-    def load_and_play_infinite(file, path="../assets/music/"):
+    def load_and_play_infinite(file, path="./assets/music/"):
         """
         Load music file and repeat forever.
 
@@ -15,7 +15,7 @@ class Music():
         mixer.music.play(-1)
     
     @staticmethod
-    def load_and_continue_play(file, path="../assets/music/"):
+    def load_and_continue_play(file, path="./assets/music/"):
         """
         Load music file and play until finished.
 

@@ -454,7 +454,7 @@ class Doodles(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="doodles",path="../assets/doodles",controls=controls,movespeed=2, 
+        super().__init__(name="doodles",path="./assets/doodles",controls=controls,movespeed=2, 
                          direction = direction,jump_height=2, width=width,height=height,
                          ground_y=270,light_dmg=8,heavy_dmg=25)
         
@@ -471,7 +471,7 @@ class Bowie(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="bowie",path="../assets/bowie",controls=controls,movespeed=4, 
+        super().__init__(name="bowie",path="./assets/bowie",controls=controls,movespeed=4, 
                          direction = direction,jump_height = 3, width=width,height=height, 
                          ground_y=285,light_dmg=5,heavy_dmg=20)
         
@@ -488,7 +488,7 @@ class Venturi(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="venturi",path="../assets/venturi",controls=controls,movespeed=6, 
+        super().__init__(name="venturi",path="./assets/venturi",controls=controls,movespeed=6, 
                          direction = direction, jump_height = 4, width=width,height=height, 
                          ground_y=270,light_dmg=3,heavy_dmg=16)
         

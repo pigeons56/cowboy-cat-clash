@@ -114,7 +114,7 @@ class Victory_Screen(Screen):
             player1_hp_bar (Hp_Bar object): HP bar of Player 1 at the end of the match.
             player2_hp_bar (Hp_Bar object): HP bar of Player 2 at the end of the match.
         """
-        super().__init__("../assets/backgrounds/battle_background.png")
+        super().__init__("./assets/backgrounds/battle_background.png")
         self.__victor = victor
         self.__loser = loser
         self.__victor_num = victor_num
@@ -132,9 +132,9 @@ class Victory_Screen(Screen):
         Load image file for Win Title (Player __ Wins!) depending on which player won.
         """
         if self.__victor_num == 1:
-            self.__win_title = pg.image.load("../assets/text/player1_win_title.png")
+            self.__win_title = pg.image.load("./assets/text/player1_win_title.png")
         else:
-            self.__win_title = pg.image.load("../assets/text/player2_win_title.png")
+            self.__win_title = pg.image.load("./assets/text/player2_win_title.png")
 
     def blit_hp_bars(self):
         """
@@ -212,7 +212,7 @@ class Battle_Screen(Screen):
             player1 (Fighter object): Chosen fighter for player 1.
             player2 (Fighter object): Chosen fighter for player 2.
         """
-        super().__init__("../assets/backgrounds/battle_background.png")
+        super().__init__("./assets/backgrounds/battle_background.png")
         
         self.__player1_fighter = player1
         self.__player1_fighter.x = 0 #Set player 1 to left side of screen
@@ -338,8 +338,8 @@ class Controls_Screen(Screen):
         """
         Initialize Controls_Screen object.
         """
-        self.__controls_title = Sprite(180, 440, 5, 100, "../assets/text/controls_title.png") 
-        super().__init__("../assets/backgrounds/controls_background.png")
+        self.__controls_title = Sprite(180, 440, 5, 100, "./assets/text/controls_title.png") 
+        super().__init__("./assets/backgrounds/controls_background.png")
         Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
@@ -359,8 +359,8 @@ class Credits_Screen(Screen):
         """
         Initialize Credits_Screen object.
         """
-        super().__init__("../assets/backgrounds/credits_background.png")
-        self.__credits_title = Sprite(210, 380, 5, 100, "../assets/text/credits_title.png") 
+        super().__init__("./assets/backgrounds/credits_background.png")
+        self.__credits_title = Sprite(210, 380, 5, 100, "./assets/text/credits_title.png") 
         Music().load_and_play_infinite("wild_west_background.mp3")
 
     def loop_functions(self):
@@ -380,18 +380,18 @@ class Select_Screen(Screen):
         """
         Initialize Select_Screen object.
         """
-        super().__init__("../assets/backgrounds/main_background.png")
-        self.__select_title = Sprite(0, 800, 0, 132, "../assets/text/select_title.png") 
-        self.__ready_button = Button("ready_button",310, 170, 300, 60,"../assets/buttons/start_button_unclicked.png",
-                              "../assets/buttons/start_button_clicked.png")
+        super().__init__("./assets/backgrounds/main_background.png")
+        self.__select_title = Sprite(0, 800, 0, 132, "./assets/text/select_title.png") 
+        self.__ready_button = Button("ready_button",310, 170, 300, 60,"./assets/buttons/start_button_unclicked.png",
+                              "./assets/buttons/start_button_clicked.png")
         
         #Placeholder will be replaced by the fighters picked by the players
         self.__player1_fighter=Fighter("placeholder","placeholder")
         self.__player2_fighter=Fighter("placeholder","placeholder")
         
         #Indicator on the fighter portrait of which player picked a fighter
-        self.__player1_picked = Sprite(0,75,0,75,"../assets/extra/player1_picked.png")
-        self.__player2_picked = Sprite(0,75,0,75,"../assets/extra/player2_picked.png")
+        self.__player1_picked = Sprite(0,75,0,75,"./assets/extra/player1_picked.png")
+        self.__player2_picked = Sprite(0,75,0,75,"./assets/extra/player2_picked.png")
 
         self.load_portraits()
 
@@ -406,8 +406,8 @@ class Select_Screen(Screen):
         portrait_size=75
         for i in range(NUM_OF_FIGHTERS):
             self.__portraits[i] = Button(FIGHTERS[i],x,portrait_size,y,portrait_size,
-                                         f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
-                                         f"../assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_clicked.png")
+                                         f"./assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_unclicked.png",
+                                         f"./assets/{FIGHTERS[i]}/portrait/{FIGHTERS[i]}_portrait_clicked.png")
             x+=portrait_size
 
     def blit_idles(self):
@@ -499,27 +499,27 @@ class Start_Screen(Screen):
         Initialize Start_Screen object.
         """
         self.__start_button = Button("start_button",310, 170, 200, 60, 
-                              "../assets/buttons/start_button_unclicked.png",
-                              "../assets/buttons/start_button_clicked.png")
+                              "./assets/buttons/start_button_unclicked.png",
+                              "./assets/buttons/start_button_clicked.png")
         self.__controls_button = Button("controls_button",265, 270, 265, 60, 
-                              "../assets/buttons/controls_button_unclicked.png",
-                              "../assets/buttons/controls_button_clicked.png")
+                              "./assets/buttons/controls_button_unclicked.png",
+                              "./assets/buttons/controls_button_clicked.png")
         self.__credits_button = Button("credits_button",290, 225, 330, 60, 
-                              "../assets/buttons/credits_button_unclicked.png",
-                              "../assets/buttons/credits_button_clicked.png")
+                              "./assets/buttons/credits_button_unclicked.png",
+                              "./assets/buttons/credits_button_clicked.png")
         
         self.__buttons = (self.__start_button,self.__controls_button,self.__credits_button)
         
-        self.__start_title = Sprite(200, 400, 5, 180, "../assets/text/start_title.png")
+        self.__start_title = Sprite(200, 400, 5, 180, "./assets/text/start_title.png")
         
         #The picture decorations next to the buttons
-        self.__start_button_extra = Sprite(482,35,213,35,"../assets/extra/start_button_extra.png")
-        self.__controls_button_extra = Sprite(222,70,234,80,"../assets/extra/controls_button_extra.png")
-        self.__credits_button_extra = Sprite(510,40,350,35,"../assets/extra/credits_button_extra.png")
+        self.__start_button_extra = Sprite(482,35,213,35,"./assets/extra/start_button_extra.png")
+        self.__controls_button_extra = Sprite(222,70,234,80,"./assets/extra/controls_button_extra.png")
+        self.__credits_button_extra = Sprite(510,40,350,35,"./assets/extra/credits_button_extra.png")
         
         Music().load_and_play_infinite("mexican_cowboys.mp3")
 
-        super().__init__("../assets/backgrounds/main_background.png")
+        super().__init__("./assets/backgrounds/main_background.png")
     
     def check_events(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
