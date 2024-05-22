@@ -16,7 +16,7 @@ class Animation():
         self._width = width
         self._height = height
         self._path = path
-        self._direction = direction
+        self._direction = "right"
         
         self.load_all_images()
         self.check_direction(direction)
