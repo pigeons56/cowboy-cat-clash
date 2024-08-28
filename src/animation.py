@@ -362,77 +362,35 @@ class Venturi_Animation(Animation):
         """
         super().__init__(width,height,path,direction)
 
-    def play_idle(self):
-        if self._count < 20:
-            self._image = self._idle_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._idle_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
     def play_move_forward(self):
-        if self._count < 20:
-            self._image = self._move_forward_images[0]
-            self._count+=1
-        if self._count >= 20:
-            self.reset_count()
+        self.animation_player(self._move_forward_images, (0,20))
+
 
     def play_move_backward(self):
-        if self._count < 20:
-            self._image = self._move_backward_images[0]
-            self._count+=1
-        if self._count >= 20:
-            self.reset_count()
+        self.animation_player(self._move_backward_images, (0,20))
+
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 40,0,40,-20,self._direction,20)
             
-            if self._count < 15:
-                self._image = self._light_attack_images[0]
-                self._count+=1
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
-
-            if self._count >= 15:
-                self.reset_count()
-                self._hitbox.deactivate(self._hurtbox)
-
-                return None
+            return self.attack_animation_player(self._light_attack_images, (0,15),
+                                0, 1,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
 
         elif attack_state == "heavy_attack":
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 40,0,-40,80,self._direction,20)
             
-            if self._count < 10:
-                self._image = self._heavy_attack_images[0]
-                self._count+=1
-            elif self._count >= 10 and self._count < 20:
-                self._image = self._heavy_attack_images[1]
-                self._count+=1
-            elif self._count >= 20 and self._count < 30:
-                self._image = self._heavy_attack_images[2]
-                self._count+=1
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
 
-            if self._count >= 30:
-                self.reset_count() 
-                self._hitbox.deactivate(self._hurtbox)
-                return None
-                        
-        return attack_state   
-    
-    def play_victory(self):
-        if self._count < 20:
-            self._image = self._victory_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._victory_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
+            return self.attack_animation_player(self._heavy_attack_images, (0,10,20,30),
+                                2,3,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
 
     def play_defeat(self):
         self._image = self._defeat_images[0]
