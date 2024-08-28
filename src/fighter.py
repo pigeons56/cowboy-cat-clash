@@ -4,13 +4,23 @@ from hurtbox import *
 from fighter_exceptions import *
 
 FIGHTERS = ("doodles","bowie","venturi")
-NUM_OF_FIGHTERS = 3
+NUM_OF_FIGHTERS = len(FIGHTERS)
 SCREEN_SIZE = (800,400)
 
 class Fighter():
-    def __init__(self, name, path, controls=None, ground_y = 0, direction="right", 
-                 movespeed=1,x=0,y=0, jump_height=0,width=100,height=100,
-                 light_dmg=10,heavy_dmg=10):
+    def __init__(self, name, 
+                 path, 
+                 controls=None, 
+                 stage_y = 0, 
+                 direction="R", 
+                 movespeed=1,
+                 x=0,
+                 y=0, 
+                 jump_height=0,
+                 width=100,
+                 height=100,
+                 light_dmg=10,
+                 heavy_dmg=10):
         """
         Initialize a Fighter object.
 
@@ -18,7 +28,7 @@ class Fighter():
             name (str): Name of fighter.
             path (str): Path to all of this fighter's image files
             controls (dict): Player 1 or 2 control scheme for this fighter
-            ground_y (int): y-value of stage for the fighter to stand on
+            stage_y (int): y-value of stage for the fighter to stand on
             direction (str): Direction of fighter
             movespeed (int): How far in the x-direction fighter can move each frame
             x (int): Fighter's x position
@@ -34,8 +44,8 @@ class Fighter():
         
         if self.name != "placeholder":
             self._movespeed = movespeed
-            self._ground_y = ground_y
-            self._ground = ground_y #The lowest y-value the fighter can reach
+            self._stage_y = stage_y
+            self._min_y = stage_y #The lowest y-value the fighter can reach
             self._x=x
             self._y=y
             self._width = width
@@ -100,12 +110,12 @@ class Fighter():
         self._y = y
     
     @property
-    def ground(self):
-        return self._ground
+    def min_y(self):
+        return self._min_y
     
-    @ground.setter
-    def ground(self, ground):
-        self._ground = ground
+    @min_y.setter
+    def min_y(self, min_y):
+        self._min_y = min_y
 
     @property
     def animation(self):
@@ -184,8 +194,8 @@ class Fighter():
         self._jump_height = jump_height
 
     @property
-    def ground_y(self):
-        return self._ground_y
+    def stage_y(self):
+        return self._stage_y
     
     def update_hurtbox(self):
         """
@@ -233,7 +243,7 @@ class Fighter():
             direction (str): Direction the fighter is facing.
             strength (int): Change in x-value during knockback
         """
-        if direction == "right":
+        if direction == "R":
             self._x -= strength
         else:
             self._x += strength 
@@ -296,7 +306,7 @@ class Fighter():
             keys (lists(bools)): State of all keys (True is pressed).
         """
         #Check if keys are pressed, jump movement is allowed, and player is not already jumping
-        if keys[self._controls["up"]] and not self._is_jump and self._y == self._ground and self._can_jump:
+        if keys[self._controls["up"]] and not self._is_jump and self._y == self._min_y and self._can_jump:
             self._is_jump = True
         if self._is_jump:
             if self._can_animate: 
@@ -313,7 +323,7 @@ class Fighter():
         """
         Bring the fighter back down to the ground after jumping.
         """
-        if not self._is_jump and self._y < self._ground:
+        if not self._is_jump and self._y < self._min_y:
             self.update_hurtbox()
             self._y += self._jump_height
 
@@ -330,15 +340,15 @@ class Fighter():
         
         return False
 
-    def check_ground(self, other_fighter):
+    def check_min_y(self, other_fighter):
         """
         Check which y-value this fighter should land on as ground.
         """
         #Land on the other fighter's head
         if self._y < other_fighter.y and (self._x + self._animation.width >= other_fighter.x and other_fighter.x + other_fighter.animation.width >= self._x):
-            self._ground = other_fighter.y - other_fighter.animation.height
+            self._min_y = other_fighter.y - other_fighter.animation.height
         else: #Otherwise land on the stage
-            self._ground = self._ground_y
+            self._min_y = self._stage_y
 
     def move(self,keys, other_fighter):
         """
@@ -355,15 +365,15 @@ class Fighter():
             self._animation.play_idle()
         
         #Try moving only if allowed
-        elif self.can_move_ground or (self.can_move_sky and self._y != self._ground):
-            if keys[self._controls["right"]]:
-                move_direction = "right"
+        elif self.can_move_ground or (self.can_move_sky and self._y != self._min_y):
+            if keys[self._controls["R"]]:
+                move_direction = "R"
                 tried_move = True
                 if self.check_fighter_collision(other_fighter,move_direction,self._movespeed):
                     self._x+=self._movespeed
             
-            elif keys[self._controls["left"]]:
-                move_direction = "left"
+            elif keys[self._controls["L"]]:
+                move_direction = "L"
                 tried_move = True
                 if self.check_fighter_collision(other_fighter,move_direction,self._movespeed):
                     self._x-=self._movespeed
@@ -391,9 +401,9 @@ class Fighter():
             return True
         
         #Checking that x-values don't overlap
-        if move_direction == "right" and self._x + dist_change + self._animation.width <= other_fighter.x:
+        if move_direction == "R" and self._x + dist_change + self._animation.width <= other_fighter.x:
             return True
-        elif move_direction == "left" and self._x - dist_change >= other_fighter.x + other_fighter.animation.width:
+        elif move_direction == "L" and self._x - dist_change >= other_fighter.x + other_fighter.animation.width:
             return True
         
         #Checking that y-values don't overlap; allows jumping over each other
@@ -440,7 +450,7 @@ class Fighter():
         Returns:
             bool: True if movement is allowed.
         """
-        return (self._can_move_ground and self._y == self._ground) or (self._can_move_sky and self._y != self._ground)
+        return (self._can_move_ground and self._y == self._min_y) or (self._can_move_sky and self._y != self._min_y)
 
 
 class Doodles(Fighter):
@@ -456,7 +466,7 @@ class Doodles(Fighter):
         """
         super().__init__(name="doodles",path="./assets/doodles",controls=controls,movespeed=2, 
                          direction = direction,jump_height=2, width=width,height=height,
-                         ground_y=270,light_dmg=8,heavy_dmg=25)
+                         stage_y=270,light_dmg=8,heavy_dmg=25)
         
         self._animation = Doodles_Animation(width,height,self._path, direction)
 
@@ -473,7 +483,7 @@ class Bowie(Fighter):
         """
         super().__init__(name="bowie",path="./assets/bowie",controls=controls,movespeed=4, 
                          direction = direction,jump_height = 3, width=width,height=height, 
-                         ground_y=285,light_dmg=5,heavy_dmg=20)
+                         stage_y=285,light_dmg=5,heavy_dmg=20)
         
         self._animation = Bowie_Animation(width,height,self._path, direction)
 
@@ -490,6 +500,6 @@ class Venturi(Fighter):
         """
         super().__init__(name="venturi",path="./assets/venturi",controls=controls,movespeed=6, 
                          direction = direction, jump_height = 4, width=width,height=height, 
-                         ground_y=270,light_dmg=3,heavy_dmg=16)
+                         stage_y=270,light_dmg=3,heavy_dmg=16)
         
         self._animation = Venturi_Animation(width,height,self._path, direction)

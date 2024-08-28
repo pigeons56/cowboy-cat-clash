@@ -75,7 +75,7 @@ class Hitbox(Hurtbox):
             direction (str): Direction of fighter.
             direction_offset (int): Change in left_x when direction is "right."
         """
-        if direction == "left":
+        if direction == "L":
             change_left_x = -change_left_x + direction_offset
 
         return (change_left_x,change_right_x,change_left_y,change_right_y)

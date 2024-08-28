@@ -8,14 +8,14 @@ from hp_bar import *
 from random import choice
 
 PLAYER1_CONTROLS = {"up": pg.K_w,
-                     "left": pg.K_a,
-                     "right": pg.K_d,
+                     "L": pg.K_a,
+                     "R": pg.K_d,
                      "heavy_attack": pg.K_q,
                      "light_attack": pg.K_e}
 
 PLAYER2_CONTROLS = {"up": pg.K_UP,
-                     "left": pg.K_LEFT,
-                     "right": pg.K_RIGHT,
+                     "L": pg.K_LEFT,
+                     "R": pg.K_RIGHT,
                      "heavy_attack": pg.K_PERIOD,
                      "light_attack": pg.K_SLASH}
 
@@ -194,11 +194,11 @@ class Victory_Screen(Screen):
 
         elif self.__next_screen == "battle":
             if self.__victor_num == 1:
-                player1 = self.reset_fighter(self.__victor,"right",PLAYER1_CONTROLS)
-                player2 = self.reset_fighter(self.__loser,"left",PLAYER2_CONTROLS)
+                player1 = self.reset_fighter(self.__victor,"R",PLAYER1_CONTROLS)
+                player2 = self.reset_fighter(self.__loser,"L",PLAYER2_CONTROLS)
             else:
-                player1 = self.reset_fighter(self.__loser,"right",PLAYER1_CONTROLS)
-                player2 = self.reset_fighter(self.__victor,"left",PLAYER2_CONTROLS)
+                player1 = self.reset_fighter(self.__loser,"R",PLAYER1_CONTROLS)
+                player2 = self.reset_fighter(self.__victor,"L",PLAYER2_CONTROLS)
             
             Battle_Screen(player1,player2).loop()
 
@@ -216,12 +216,12 @@ class Battle_Screen(Screen):
         
         self.__player1_fighter = player1
         self.__player1_fighter.x = 0 #Set player 1 to left side of screen
-        self.__player1_fighter.y = self.__player1_fighter.ground_y #Make sure player 1 is standing on the stage
+        self.__player1_fighter.y = self.__player1_fighter.stage_y #Make sure player 1 is standing on the stage
         self.__player1_fighter.update_hurtbox() #Update hurtbox to current position
         
         self.__player2_fighter = player2
         self.__player2_fighter.x = 700 #Set player 2 to right side of screen
-        self.__player2_fighter.y = self.__player2_fighter.ground_y #Make sure player 1 is standing on the stage
+        self.__player2_fighter.y = self.__player2_fighter.stage_y #Make sure player 1 is standing on the stage
         self.__player2_fighter.update_hurtbox() #Update hurtbox to current position
 
         self.__music_list = ("ash_and_dust.mp3","riding_solo.mp3","the_outlaw_arrives.mp3",
@@ -272,7 +272,7 @@ class Battle_Screen(Screen):
         """
         this_fighter.move(keys,other_fighter)
         this_fighter.jump(keys)
-        this_fighter.check_ground(other_fighter)
+        this_fighter.check_min_y(other_fighter)
         this_fighter.fall()
         this_fighter.attack(keys)
         
@@ -284,11 +284,11 @@ class Battle_Screen(Screen):
         player2_can_flip = self.__player2_fighter.check_can_flip()
 
         if self.__player1_fighter.x > self.__player2_fighter.x:
-            if player1_can_flip: self.__player1_fighter.animation.check_direction("left")
-            if player2_can_flip: self.__player2_fighter.animation.check_direction("right")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("L")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("R")
         else:
-            if player1_can_flip: self.__player1_fighter.animation.check_direction("right")
-            if player2_can_flip: self.__player2_fighter.animation.check_direction("left")
+            if player1_can_flip: self.__player1_fighter.animation.check_direction("R")
+            if player2_can_flip: self.__player2_fighter.animation.check_direction("L")
     
     def check_fighter_hit(self):
         """
@@ -465,13 +465,13 @@ class Select_Screen(Screen):
             for i in self.__portraits:
                 if i.clicked:
                     if event.button == 1: #Left click on portrait sets player 1
-                        self.__player1_fighter = self.set_this_fighter(i.name,self.__player1_fighter, "right",PLAYER1_CONTROLS)
+                        self.__player1_fighter = self.set_this_fighter(i.name,self.__player1_fighter, "R",PLAYER1_CONTROLS)
                         
                         #Setting the player indicator on the portrait
                         self.__player1_picked.left_x = i.left_x-10
                         self.__player1_picked.left_y = i.left_y - 10
                     elif event.button == 3: #Right click on portrait sets player 2
-                        self.__player2_fighter = self.set_this_fighter(i.name,self.__player2_fighter, "left",PLAYER2_CONTROLS)
+                        self.__player2_fighter = self.set_this_fighter(i.name,self.__player2_fighter, "L",PLAYER2_CONTROLS)
                         
                         #Setting the player indicator on the portrait
                         self.__player2_picked.left_x = i.left_x+10

@@ -16,10 +16,16 @@ class Animation():
         self._width = width
         self._height = height
         self._path = path
-        self._direction = "right"
+
+        #Default to right because images face right by default.
+        self._direction = "R"
         
+        #Load images (currently facing right)
         self.load_all_images()
+        
+        #Check if direction should be left, flip if needed
         self.check_direction(direction)
+
         self._image = self._idle_images[0]
         
         #Initialize hurtbox and hitbox objects
@@ -61,7 +67,7 @@ class Animation():
             array (list(Pygame Image objects)): Stores loaded images
         
         Returns:
-            array (list(Pygame Image objects)): List filled with loaded images.
+            array (list(Pygame Image objects)): Tuple filled with loaded images.
         """
         for i in os.listdir(path):
             array.append(pg.image.load(f"{path}/{i}"))
@@ -167,6 +173,9 @@ class Animation():
         """
         self._count = 0
 
+    #The following functions are for playing animation. There is a default animation
+    #sequence that each fighter can override for a unique sequence.
+
     def play_jump(self):
         """
         Play jump animation.
@@ -177,36 +186,96 @@ class Animation():
         """
         Play idle animation.
         """
-        pass
+        self.animation_player(self._idle_images, (0,20,40))
+
+    #play_attack() has no default b/c each fighter is expected to
+    #have unique attacks
 
     def play_attack(self):
         """
         Play light or heavy attack animation.
         """
+        pass
 
     def play_move_forward(self):
         """
         Play move forward animation.
         """
-        pass
+        self.animation_player(self._move_forward_images, (0,20,40))
 
     def play_move_backward(self):
         """
         Play move backward animation.
         """
-        pass
+        self.animation_player(self._move_backward_images, (0,20,40))
 
     def play_victory(self):
         """
         Play victory animation.
         """
-        pass
+        self.animation_player(self._victory_images, (0,20,40))
 
     def play_defeat(self):
         """
         Play defeat animation.
         """
-        pass
+        self.animation_player(self._defeat_images, (0,20,40), is_loop = False)
+
+    def animation_player(self, images, counts, is_loop = True):
+        """
+        Change images for animation according to how many counts have passed.
+
+        Parameters:
+            images (list(Pygame Image objects)): Loaded images of the specific 
+                                                  animation
+            counts (tuple(Int)): How long to wait between each animation. Final integer 
+                            indicates end of animation. Length is length of images - 1.
+            is_loop (boolean): Whether to loop the animation. Default is True.
+        """
+        for i in range(len(counts)):
+            if self._count >= counts[-1]:
+                if is_loop: self.reset_count() #Loops the animation
+                break
+            elif self._count >= counts[i] and self._count < counts[i+1]: 
+                if self._image != images[i]:
+                    self._image = images[i]
+                self._count+=1
+    
+    def attack_animation_player(self, images, counts,
+                                hitbox_activate, hitbox_deactivate,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state):
+        """
+        Does the same thing as animation_player, but updates hitbox
+
+        Parameters:
+            images (list(Pygame Image objects)): Loaded images of the specific 
+                                                  animation
+            counts (tuple(Int)): How long to wait between each animation. Final integer 
+                            indicates end of animation. Length is length of images - 1.
+            hitbox_activate (Int): Frame hitbox should be activated.
+            hitbox_deactivate (Int): Frame hitbox should be deactivated.
+        """
+        for i in range(len(counts)):
+            if self._count >= counts[-1]:
+                self._hitbox.deactivate(self._hurtbox) #Make sure hurtbox is deactivated
+                self.reset_count() #Loops the animation
+
+                return None #Indicator that the attack is finished
+            
+            elif self._count >= counts[i] and self._count < counts[i+1]: 
+                if i == hitbox_activate:
+                    self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
+                elif i == hitbox_deactivate:
+                    self._hitbox.deactivate(self._hurtbox)                
+
+                if self._image != images[i]:
+                    self._image = images[i]
+                self._count+=1
+
+                return attack_state #Attack is still going
+
 
 class Bowie_Animation(Animation):
     def __init__(self, width, height, path, direction):
@@ -221,100 +290,27 @@ class Bowie_Animation(Animation):
         """
         super().__init__(width,height,path,direction)
 
-    def play_idle(self):
-        #Count keeps track of animation progression
-        #Each frame of the animation is displayed for a certain amount of counts
-        if self._count < 20: 
-            self._image = self._idle_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._idle_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count() #Loops the animation
-
-    def play_move_forward(self):
-        if self._count < 20:
-            self._image = self._move_forward_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._move_forward_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
-    def play_move_backward(self):
-        if self._count < 20:
-            self._image = self._move_backward_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._move_backward_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
 
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 50,20,20,-10,self._direction,20)
             
-            if self._count < 15:
-                self._image = self._light_attack_images[0]
-                self._count+=1
-
-                #Hitbox is only active on this frame
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
-                
-            if self._count >= 15:
-                self.reset_count()
-
-                #Hitbox is no longer active
-                self._hitbox.deactivate(self._hurtbox)
-                
-                return None
+            return self.attack_animation_player(self._light_attack_images, (0,15),
+                                0, 1,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
 
         elif attack_state == "heavy_attack":
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 40,20,0,10,self._direction,20)
             
-            if self._count < 10:
-                self._image = self._heavy_attack_images[0]
-                self._count+=1
-            elif self._count >= 10 and self._count < 20:
-                self._image = self._heavy_attack_images[1]
-                self._count+=1
-            elif self._count >= 20 and self._count < 30:
-                self._image = self._heavy_attack_images[2]
-                self._count+=1
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
-            elif self._count >= 30:
-                self._image = self._heavy_attack_images[3]
-                self._hitbox.deactivate(self._hurtbox)
-                self._count+=1
-            if self._count >= 40:
-                self.reset_count() 
-                return None
-                        
-        return attack_state   
-
-    def play_victory(self):
-        if self._count < 20:
-            self._image = self._victory_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._victory_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
-    def play_defeat(self):
-        if self._count < 20:
-            self._image = self._defeat_images[0]
-            self._count+=1
-        else:
-            self._image = self._defeat_images[1] 
-            #No need to loop this animation
+            return self.attack_animation_player(self._heavy_attack_images, (0,10,20,30,40),
+                                2, 3,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
 
 class Doodles_Animation(Animation):
     def __init__(self, width, height, path, direction):
@@ -329,101 +325,29 @@ class Doodles_Animation(Animation):
         """
         super().__init__(width,height,path,direction)
 
-    def play_idle(self):
-        if self._count < 20:
-            self._image = self._idle_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._idle_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
-    def play_move_forward(self):
-        if self._count < 20:
-            self._image = self._move_forward_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._move_forward_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
-    def play_move_backward(self):
-        if self._count < 20:
-            self._image = self._move_backward_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._move_backward_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
 
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 60,0,30,0,self._direction,30)
             
-            if self._count < 15:
-                self._image = self._light_attack_images[0]
-                self._count+=1
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
 
-            if self._count >= 15:
-                self.reset_count()
-                self._hitbox.deactivate(self._hurtbox)
-
-                return None
+            return self.attack_animation_player(self._light_attack_images, (0,15),
+                                0, 1,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
 
         elif attack_state == "heavy_attack":
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 -30,80,10,30,self._direction,-60)
 
-            if self._count < 10:
-                self._image = self._heavy_attack_images[0]
-                self._count+=1
-            elif self._count >= 10 and self._count < 20:
-                self._image = self._heavy_attack_images[1]
-                self._count+=1
-            elif self._count >= 20 and self._count < 40:
-                self._image = self._heavy_attack_images[2]
-                self._count+=1
-            elif self._count >= 40 and self._count < 50:
-                self._image = self._heavy_attack_images[3]
-                self._count+=1
-                self._hitbox.activate(self._hurtbox,change_left_x,change_right_x,change_left_y,change_right_y)
-
-            elif self._count >= 50:
-                self._image = self._heavy_attack_images[4]
-                self._count+=1
-                self._hitbox.deactivate(self._hurtbox)
-
-            if self._count >= 70:
-                self.reset_count() 
-                return None
-                        
-        return attack_state   
-
-    def play_victory(self):
-        if self._count < 20:
-            self._image = self._victory_images[0]
-            self._count+=1
-        elif self._count >= 20:
-            self._image = self._victory_images[1]
-            self._count+=1
-        if self._count >= 40:
-            self.reset_count()
-
-    def play_defeat(self):
-        if self._count < 20:
-            self._image = self._defeat_images[0]
-            self._count+=1
-        else:
-            self._image = self._defeat_images[1]
-
-
-    
+            return self.attack_animation_player(self._heavy_attack_images, (0,10,20,40,50,70),
+                                3,4,
+                                change_left_x,change_right_x,
+                                change_left_y,change_right_y,
+                                attack_state)
+       
 
 class Venturi_Animation(Animation):
     def __init__(self, width, height, path, direction):
