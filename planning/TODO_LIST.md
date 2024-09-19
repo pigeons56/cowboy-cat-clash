@@ -2,7 +2,7 @@
 
 - Custom controls/dynamic Controls Screen
 - Dynamic Credits Screen
-- Uniform animation method
+- ~~Uniform animation method~~
 - Use different sized PNGs
 - Better hitbox/hurtbox for left/right
 - Rebalance Venturi

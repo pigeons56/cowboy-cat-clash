@@ -1,20 +1,15 @@
 import pygame as pg
 import os
-from hurtbox import *
 
 class Animation():
-    def __init__(self, width, height, path, direction):
+    def __init__(self, path, direction,hurtbox,hitbox):
         """
         Initialize Animation object.
 
         Parameters:
-            width (int): Width of image
-            height (int): Height of image
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        self._width = width
-        self._height = height
         self._path = path
 
         #Default to right because images face right by default.
@@ -29,30 +24,14 @@ class Animation():
         self._image = self._idle_images[0]
         
         #Initialize hurtbox and hitbox objects
-        self._hurtbox = Hurtbox(0,0,0,0)
-        self._hitbox = Hitbox(0,0,0,0)
+        self._hurtbox = hurtbox
+        self._hitbox = hitbox
         
         self.reset_count()
     
     @property
-    def hurtbox(self):
-        return self._hurtbox
-
-    @property
-    def hitbox(self):
-        return self._hitbox
-
-    @property
     def image(self):
         return self._image
-
-    @property
-    def width(self):
-        return self._width
-    
-    @property
-    def height(self):
-        return self._height
     
     @property
     def direction(self):
@@ -278,17 +257,15 @@ class Animation():
 
 
 class Bowie_Animation(Animation):
-    def __init__(self, width, height, path, direction):
+    def __init__(self, path, direction,hurtbox,hitbox):
         """
         Initialize Bowie_Animation object.
 
         Parameters:
-            width (int): Width of image
-            height (int): Height of image
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(width,height,path,direction)
+        super().__init__(path,direction,hurtbox,hitbox)
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
@@ -296,8 +273,8 @@ class Bowie_Animation(Animation):
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
                 50,20,20,-10,self._direction,20)
             
-            return self.attack_animation_player(self._light_attack_images, (0,15),
-                                0, 1,
+            return self.attack_animation_player(self._light_attack_images, (0,15,50,55,60,75,90,105,120),
+                                0, 6,
                                 change_left_x,change_right_x,
                                 change_left_y,change_right_y,
                                 attack_state)
@@ -313,17 +290,15 @@ class Bowie_Animation(Animation):
                                 attack_state)
 
 class Doodles_Animation(Animation):
-    def __init__(self, width, height, path, direction):
+    def __init__(self, path, direction,hurtbox,hitbox):
         """
         Initialize Doodles_Animation object.
 
         Parameters:
-            width (int): Width of image
-            height (int): Height of image
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(width,height,path,direction)
+        super().__init__(path,direction,hurtbox,hitbox)
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
@@ -350,17 +325,15 @@ class Doodles_Animation(Animation):
        
 
 class Venturi_Animation(Animation):
-    def __init__(self, width, height, path, direction):
+    def __init__(self, path, direction,hurtbox,hitbox):
         """
         Initialize Venturi_Animation object.
 
         Parameters:
-            width (int): Width of image
-            height (int): Height of image
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(width,height,path,direction)
+        super().__init__(path,direction,hurtbox,hitbox)
 
     def play_move_forward(self):
         self.animation_player(self._move_forward_images, (0,20))
