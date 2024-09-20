@@ -42,7 +42,7 @@ class Fighter():
         self.path = path
         self.name = name
         
-        if self.name != "placeholder":
+        if self.name != "placeholder": #Used during fighter select
             self._movespeed = movespeed
             self._stage_y = stage_y
             self._min_y = stage_y #The lowest y-value the fighter can reach
@@ -71,7 +71,16 @@ class Fighter():
             self._heavy_dmg = heavy_dmg
             self._light_dmg = light_dmg
 
-            self._animation = Animation(self._width,self._height,self._path, direction)
+            self._hurtbox = Hurtbox()
+            self._hitbox = Hitbox()
+    
+    @property
+    def hurtbox(self):
+        return self._hurtbox
+    
+    @property
+    def hitbox(self):
+        return self._hitbox
     
     @property
     def hp(self):
@@ -89,10 +98,6 @@ class Fighter():
     def movespeed(self):
         return self._movespeed
     
-    @movespeed.setter
-    def movespeed(self, movespeed):
-        self._movespeed = movespeed
-
     @property
     def x(self):
         return self._x
@@ -112,10 +117,6 @@ class Fighter():
     @property
     def min_y(self):
         return self._min_y
-    
-    @min_y.setter
-    def min_y(self, min_y):
-        self._min_y = min_y
 
     @property
     def animation(self):
@@ -125,25 +126,13 @@ class Fighter():
     def attack_state(self):
         return self._attack_state
 
-    @attack_state.setter
-    def attack_state(self, attack_state):
-        self._attack_state = attack_state
-
     @property
     def can_attack(self):
         return self._can_attack
-    
-    @can_attack.setter
-    def can_attack(self,can_attack):
-        self._can_attack = can_attack
 
     @property
     def can_jump(self):
         return self._can_jump
-    
-    @can_jump.setter
-    def can_jump(self,can_jump):
-        self._can_jump = can_jump
 
     @property
     def can_move_ground(self):
@@ -156,42 +145,24 @@ class Fighter():
     @property
     def can_move_sky(self):
         return self._can_move_sky
-    
-    @can_move_sky.setter
-    def can_move_sky(self,can_move_sky):
-        self._can_move_sky = can_move_sky
 
     @property
     def can_animate(self):
         return self._can_animate
-    
-    @can_move_sky.setter
-    def can_animate(self,can_animate):
-        self._can_animate = can_animate
+
 
     @property
     def is_jump(self):
         return self._is_jump
     
-    @is_jump.setter
-    def is_jump(self,is_jump):
-        self._is_jump = is_jump
 
     @property
     def jump_count(self):
         return self._jump_count
-    
-    @jump_count.setter
-    def jump_count(self,jump_count):
-        self._jump_count = jump_count
 
     @property
     def jump_height(self):
         return self._jump_height
-    
-    @jump_height.setter
-    def jump_height(self,jump_height):
-        self._jump_height = jump_height
 
     @property
     def stage_y(self):
@@ -201,7 +172,7 @@ class Fighter():
         """
         Update fighter's hurtbox to current x,y position.
         """
-        self._animation.hurtbox.set_size(self._x,self._y,self._width,self._height)
+        self._hurtbox.set_size(self._x,self._y,self._width,self._height)
 
     def take_dmg(self,other_fighter):
         """
@@ -210,7 +181,7 @@ class Fighter():
         Parameters:
             other_fighter (Fighter object): Fighter that is not this one.
         """
-        if other_fighter.animation.hitbox.is_hit(self._animation.hurtbox) and other_fighter.animation.hitbox.active:
+        if other_fighter.hitbox.is_hit(self._hurtbox) and other_fighter.hitbox.active:
             if other_fighter.attack_state == "light_attack":
                 if self._can_take_dmg: self._hp -= other_fighter.light_dmg
                 self.knockback(self._animation.direction,2)
@@ -464,11 +435,13 @@ class Doodles(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="doodles",path="./assets/doodles",controls=controls,movespeed=2, 
+        self.__path = "./assets/doodles"
+
+        super().__init__(name="doodles",path=self.__path,controls=controls,movespeed=2, 
                          direction = direction,jump_height=2, width=width,height=height,
                          stage_y=270,light_dmg=8,heavy_dmg=25)
         
-        self._animation = Doodles_Animation(width,height,self._path, direction)
+        self._animation = Doodles_Animation(self.__path, direction, self._hurtbox, self._hitbox)
 
 class Bowie(Fighter):
     def __init__(self, direction, controls, width=60,height=57):
@@ -481,11 +454,13 @@ class Bowie(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="bowie",path="./assets/bowie",controls=controls,movespeed=4, 
+        self.__path = "./assets/bowie"
+
+        super().__init__(name="bowie",path=self.__path,controls=controls,movespeed=4, 
                          direction = direction,jump_height = 3, width=width,height=height, 
                          stage_y=285,light_dmg=5,heavy_dmg=20)
         
-        self._animation = Bowie_Animation(width,height,self._path, direction)
+        self._animation = Bowie_Animation(self.__path, direction, self._hurtbox, self._hitbox)
 
 class Venturi(Fighter):
     def __init__(self, direction,controls,width=75,height=60):
@@ -498,8 +473,10 @@ class Venturi(Fighter):
             width (int): Width of fighter image.
             height (int): Height of fighter image.
         """
-        super().__init__(name="venturi",path="./assets/venturi",controls=controls,movespeed=6, 
+        self.__path = "./assets/venturi"
+        
+        super().__init__(name="venturi",path=self.__path,controls=controls,movespeed=6, 
                          direction = direction, jump_height = 4, width=width,height=height, 
                          stage_y=270,light_dmg=3,heavy_dmg=16)
         
-        self._animation = Venturi_Animation(width,height,self._path, direction)
+        self._animation = Venturi_Animation(self.__path, direction, self._hurtbox, self._hitbox)

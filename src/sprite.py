@@ -22,17 +22,13 @@ class Sprite():
     @property
     def path(self):
         return self._path
-    
-    @path.setter
-    def path(self, path):
-        self._path = path
 
     @property
     def left_x(self):
         return self._left_x
     
     @left_x.setter
-    def left_x(self,left_x):
+    def left_x(self, left_x):
         self._left_x = left_x
 
     @property
@@ -46,10 +42,11 @@ class Sprite():
     @property
     def image(self):
         return self._image
-
+    
     @image.setter
     def image(self, image):
         self._image = image
+
     
 class Button(Sprite):
     def __init__(self, name, left_x, width, left_y, height, path, clicked_path):
@@ -81,10 +78,6 @@ class Button(Sprite):
     def clicked_path(self):
         return self.__clicked_path
     
-    @clicked_path.setter
-    def clicked_path(self, clicked_path):
-        self.__clicked_path = clicked_path
-
     @property
     def name(self):
         return self.__name
