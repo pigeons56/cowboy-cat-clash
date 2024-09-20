@@ -17,11 +17,12 @@ class Hurtbox():
     def box(self):
         return self._box
     
-    def set_size(self, left_x,left_y,right_x,right_y):
+    def set_size(self, direction, left_x,left_y,right_x,right_y):
         """
         Change size of hurtbox. 
 
         Parameters:
+            direction (str): Direction the fighter is facing
             left_x (int): Left x-value
             right_x (int): Right x-value (width)
             left_y (int): Left y-value
@@ -31,7 +32,11 @@ class Hurtbox():
         self._right_x = right_x
         self._left_y = left_y
         self._right_y = right_y
-        self._box.update(left_x+25,left_y+30,right_x-15,right_y-20)
+
+        if direction == "L":
+            self._box.update(2 * left_x - left_x, 2 * left_y - left_y, left_x, left_y)
+        elif direction == "R":
+            self._box.update(left_x, left_y,right_x, right_y)
     
 
 class Hitbox(Hurtbox):
@@ -49,57 +54,27 @@ class Hitbox(Hurtbox):
     @active.setter
     def active(self,active):
         self.__active = active
-    
-    def set_change_variables(self, change_left_x,change_right_x,change_left_y,change_right_y,
-                             direction,direction_offset):
-        """
-        Set how much the size of hitbox will be adjusted relative to hurtbox.
 
-        Parameters:
-            change_left_x (int): Change in left x-value.
-            change_right_x (int): Change in right x-value (width).
-            change_left_y (int): Change in left y-value.
-            change_right_y (int): Change in right y-value (height).
-            direction (str): Direction of fighter.
-            direction_offset (int): Change in left_x when direction is "right."
+    def activate(self):
         """
-        if direction == "L":
-            change_left_x = -change_left_x + direction_offset
-
-        return (change_left_x,change_right_x,change_left_y,change_right_y)
-
-    def activate(self, hurtbox, change_left_x,change_right_x,change_left_y,change_right_y):
+        Turn on hitbox.
         """
-        Set hitbox size and turn active.
-        
-        Parameters:
-            hurtbox (Hurtbox object): Hurtbox of the fighter.
-            change_left_x (int): Change in left x-value.
-            change_right_x (int): Change in right x-value (width).
-            change_left_y (int): Change in left y-value.
-            change_right_y (int): Change in right y-value (height).
-        """
-        self._box.update(hurtbox._left_x + change_left_x, hurtbox._left_y + change_left_y,
-                         hurtbox._right_x + change_right_x, hurtbox._right_y + change_right_y)
-        
         if not self.__active:
             self.__active = True
     
-    def deactivate(self, hurtbox):
+    def deactivate(self):
         """
-        Reset hitbox size to hurtbox's size and turn active false.
-
-        Parameters:
-            hurtbox (Hurtbox object): Hurtbox of the fighter.
+        Turn off hitbox.
         """
-        if self.__active:
-            self._box = hurtbox.box.copy()      
+        if self.__active:     
             self.__active = False
 
     def is_hit(self, hurtbox):
         """
-        Check if hitbox collided with other fighter's hurtbox.
+        Check if hitbox collided with a hurtbox.
 
+        Parmeters:
+            hurtbox (Hurtbox object): Hurtbox to check for collision. Usually the other fighter's hurtbox.
         Returns:
             bool: True if hit, false it not hit.
         """
