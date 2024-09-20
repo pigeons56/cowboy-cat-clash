@@ -2,7 +2,7 @@ import pygame as pg
 import os
 
 class Animation():
-    def __init__(self, path, direction,hurtbox,hitbox):
+    def __init__(self, path, direction):
         """
         Initialize Animation object.
 
@@ -22,10 +22,6 @@ class Animation():
         self.check_direction(direction)
 
         self._image = self._idle_images[0]
-        
-        #Initialize hurtbox and hitbox objects
-        self._hurtbox = hurtbox
-        self._hitbox = hitbox
         
         self.reset_count()
     
@@ -224,9 +220,10 @@ class Animation():
                                 hitbox_activate, hitbox_deactivate,
                                 change_left_x,change_right_x,
                                 change_left_y,change_right_y,
-                                attack_state):
+                                attack_state,
+                                hitbox, hurtbox):
         """
-        Does the same thing as animation_player, but updates hitbox
+        Does the same thing as animation_player, but updates hitbox & hurtbox
 
         Parameters:
             images (list(Pygame Image objects)): Loaded images of the specific 
@@ -235,10 +232,12 @@ class Animation():
                             indicates end of animation. Length is length of images - 1.
             hitbox_activate (Int): Frame hitbox should be activated.
             hitbox_deactivate (Int): Frame hitbox should be deactivated.
+
+            TODO
         """
         for i in range(len(counts)):
             if self._count >= counts[-1]:
-                self._hitbox.deactivate(self._hurtbox) #Make sure hurtbox is deactivated
+                self._hitbox.deactivate() #Make sure hitbox is deactivated
                 self.reset_count() #Loops the animation
 
                 return None #Indicator that the attack is finished
@@ -257,7 +256,7 @@ class Animation():
 
 
 class Bowie_Animation(Animation):
-    def __init__(self, path, direction,hurtbox,hitbox):
+    def __init__(self, path, direction):
         """
         Initialize Bowie_Animation object.
 
@@ -265,7 +264,7 @@ class Bowie_Animation(Animation):
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(path,direction,hurtbox,hitbox)
+        super().__init__(path,direction)
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
@@ -290,7 +289,7 @@ class Bowie_Animation(Animation):
             
 
 class Doodles_Animation(Animation):
-    def __init__(self, path, direction,hurtbox,hitbox):
+    def __init__(self, path, direction):
         """
         Initialize Doodles_Animation object.
 
@@ -298,7 +297,7 @@ class Doodles_Animation(Animation):
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(path,direction,hurtbox,hitbox)
+        super().__init__(path,direction)
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
@@ -325,7 +324,7 @@ class Doodles_Animation(Animation):
        
 
 class Venturi_Animation(Animation):
-    def __init__(self, path, direction,hurtbox,hitbox):
+    def __init__(self, path, direction):
         """
         Initialize Venturi_Animation object.
 
@@ -333,7 +332,7 @@ class Venturi_Animation(Animation):
             path (str): Path to all of fighter's images
             direction (str): Direction fighter is facing
         """
-        super().__init__(path,direction,hurtbox,hitbox)
+        super().__init__(path,direction)
 
     def play_move_forward(self):
         self.animation_player(self._move_forward_images, (0,20))
