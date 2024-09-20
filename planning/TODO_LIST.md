@@ -6,6 +6,12 @@
 - Use different sized PNGs
 - Better hitbox/hurtbox for left/right
 - Rebalance Venturi
+- Animation should not have separate Hurt/Hitbox objects
+    - Right now, Animation will not receive new coords
+    - Make Hurt/Hitbox a parameter for each animation
+- Attack animations need to take multiple Hitboxes & Hitbox locations
+- New Doodles Animations
+- New Venturi Animations
 
 # NEW FEATURES
 
