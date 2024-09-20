@@ -269,25 +269,25 @@ class Bowie_Animation(Animation):
 
     def play_attack(self, attack_state):
         if attack_state == "light_attack":
-
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
-                50,20,20,-10,self._direction,20)
+                40,20,0,10,self._direction,20)
             
-            return self.attack_animation_player(self._light_attack_images, (0,5,10,15,20,30,40,50,60),
-                                0, 6,
+            return self.attack_animation_player(self._light_attack_images, (0,5,15,25,35),
+                                2, 3,
                                 change_left_x,change_right_x,
                                 change_left_y,change_right_y,
                                 attack_state)
 
         elif attack_state == "heavy_attack":
             change_left_x,change_right_x,change_left_y,change_right_y = self._hitbox.set_change_variables(
-                40,20,0,10,self._direction,20)
+                50,20,20,-10,self._direction,20)
             
-            return self.attack_animation_player(self._heavy_attack_images, (0,5,15,25,35),
-                                2, 3,
+            return self.attack_animation_player(self._heavy_attack_images, (0,5,10,15,20,30,40,50,60),
+                                0, 6,
                                 change_left_x,change_right_x,
                                 change_left_y,change_right_y,
                                 attack_state)
+            
 
 class Doodles_Animation(Animation):
     def __init__(self, path, direction,hurtbox,hitbox):
