@@ -1,20 +1,14 @@
 import pygame as pg
 
 class Hurtbox():
-    def __init__(self, left_x, right_x, left_y, right_y):
+    def __init__(self):
         """
         Initialize Hurtbox object.
-
-        Parameters:
-            left_x (int): Left x-value
-            right_x (int): Right x-value (width)
-            left_y (int): Left y-value
-            right_y (int): Right y-value (height)
         """
-        self._left_x = left_x
-        self._right_x = right_x
-        self._left_y = left_y
-        self._right_y = right_y
+        self._left_x = 0
+        self._right_x = 0
+        self._left_y = 0
+        self._right_y = 0
 
         #Pygame rect object used to represent box b/c of built-in collision methods and easy to display
         self._box = pg.Rect(self._left_x,self._left_y,self._right_x,self._right_y)
@@ -41,17 +35,11 @@ class Hurtbox():
     
 
 class Hitbox(Hurtbox):
-    def __init__(self, left_x, right_x, left_y, right_y):
+    def __init__(self):
         """
         Initialize Hitbox object.
-
-        Parameters:
-            left_x (int): Left x-value
-            right_x (int): Right x-value (width)
-            left_y (int): Left y-value
-            right_y (int): Right y-value (height)
         """
-        super().__init__(left_x, right_x, left_y, right_y)
+        super().__init__()
         self.__active = False #Whether or not hitbox is on
 
     @property
