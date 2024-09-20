@@ -444,7 +444,7 @@ class Doodles(Fighter):
         self._animation = Doodles_Animation(self.__path, direction, self._hurtbox, self._hitbox)
 
 class Bowie(Fighter):
-    def __init__(self, direction, controls, width=60,height=57):
+    def __init__(self, direction, controls, width=0,height=0):
         """
         Initialize Bowie object.
 
@@ -458,7 +458,7 @@ class Bowie(Fighter):
 
         super().__init__(name="bowie",path=self.__path,controls=controls,movespeed=4, 
                          direction = direction,jump_height = 3, width=width,height=height, 
-                         stage_y=285,light_dmg=5,heavy_dmg=20)
+                         stage_y=0,light_dmg=5,heavy_dmg=20)
         
         self._animation = Bowie_Animation(self.__path, direction, self._hurtbox, self._hitbox)
 
